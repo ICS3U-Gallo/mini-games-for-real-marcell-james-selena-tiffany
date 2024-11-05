@@ -1,3 +1,5 @@
+import random
+import sys
 import pygame
 
 
@@ -12,7 +14,8 @@ clock = pygame.time.Clock()
 
 # ---------------------------
 # Initialize global variables
-
+cloonie_x = 200
+cloonie_y = 200
 
 # ---------------------------
 
@@ -28,6 +31,9 @@ while running:
 
     # DRAWING
     screen.fill((255, 255, 255))  # always the first drawing command
+    pygame.draw.circle(screen, (214, 255, 255), (cloonie_x, cloonie_y), 30)
+    pygame.draw.circle(screen, (255, 0, 0), (cloonie_x + 27, cloonie_y), 7)
+    pygame.draw.circle(screen, (0, 0, 0), (cloonie_x + 7, cloonie_y - 11), 7)
 
     # Must be the last two lines
     # of the game loop
