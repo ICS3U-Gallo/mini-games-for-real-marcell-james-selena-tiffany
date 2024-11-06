@@ -11,17 +11,32 @@ SIZE = (WIDTH, HEIGHT)
 
 screen = pygame.display.set_mode(SIZE)
 clock = pygame.time.Clock()
+fps = 60
+
+cloonie = pygame.image.load("cloonie.png")
+cloonie1 = pygame.transform.scale(cloonie, (40, 40))
+beckground = pygame.image.load("background.png")
+ground = pygame.image.load("ground.png")
+ground_scroll = 0
+scroll_speed = 4
+jump = False
+vel = 0
 
 # ---------------------------
 # Initialize global variables
-cloonie_x = 200
-cloonie_y = 200
+
+vel += 0.5
 
 # ---------------------------
 
 running = True
 while running:
+
+    clock.tick(fps)
+
     # EVENT HANDLING
+    
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
@@ -31,9 +46,18 @@ while running:
 
     # DRAWING
     screen.fill((255, 255, 255))  # always the first drawing command
-    pygame.draw.circle(screen, (214, 255, 255), (cloonie_x, cloonie_y), 30)
-    pygame.draw.circle(screen, (255, 0, 0), (cloonie_x + 27, cloonie_y), 7)
-    pygame.draw.circle(screen, (0, 0, 0), (cloonie_x + 7, cloonie_y - 11), 7)
+    #background
+    screen.blit(beckground, (0, 0))
+    #background and scroll
+    screen.blit(ground, (ground_scroll, 350))
+    ground_scroll -= scroll_speed
+    if abs(ground_scroll) > 10:
+        ground_scroll = 0
+    #clown
+    screen.blit(cloonie1, (100, 0))
+    
+    
+
 
     # Must be the last two lines
     # of the game loop
