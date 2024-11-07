@@ -23,50 +23,25 @@ balloon_y = 100
 balloon_x_speed = 10
 balloon_y_speed = 10
 
-balloon_2_x = 100
-balloon_2_y = 100
+balloon_2_x = 500
+balloon_2_y = 200
 balloon_2_x_speed = 10
 balloon_2_y_speed = 10
 
-balloon_3_x = 100
-balloon_3_y = 100
+balloon_3_x = 400
+balloon_3_y = 150
 balloon_3_x_speed = 10
 balloon_3_y_speed = 10
 
-balloon_4_x = 100
-balloon_4_y = 100
+balloon_4_x = 600
+balloon_4_y = 50
 balloon_4_x_speed = 10
 balloon_4_y_speed = 10
 
-balloon_5_x = 100
+balloon_5_x = 350
 balloon_5_y = 100
 balloon_5_x_speed = 10
 balloon_5_y_speed = 10
-
-balloon_6_x = 100
-balloon_6_y = 100
-balloon_6_x_speed = 10
-balloon_6_y_speed = 10
-
-balloon_7_x = 100
-balloon_7_y = 100
-balloon_7_x_speed = 10
-balloon_7_y_speed = 10
-
-balloon_8_x = 100
-balloon_8_y = 100
-balloon_8_x_speed = 10
-balloon_8_y_speed = 10
-
-balloon_9_x = 100
-balloon_9_y = 100
-balloon_9_x_speed = 10
-balloon_9_y_speed = 10
-
-balloon_10_x = 100
-balloon_10_y = 100
-balloon_10_x_speed = 10
-balloon_10_y_speed = 10
 
 darts = []
 # ---------------------------
@@ -77,31 +52,92 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        elif event.type == pygame.MOUSEBUTTONDOWN:
-            dart = [player_x,player_y-25]
-            darts.append(dart)
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE:
+                dart = [player_x,player_y-25]
+                darts.append(dart)
 
     # GAME STATE UPDATES
     # All game math and comparisons happen here
+    #Balloon Reseter 1
+        
     for pos in darts:
         pos[1] -= 30
     mouse_x, mouse_y = pygame.mouse.get_pos()
     player_x = mouse_x
     player_y = mouse_y
-
-    if balloon_x+12.5 >= WIDTH or balloon_x-12.5 <= 0:
+    #Balloons
+        #Balloon 1
+    if balloon_x+25 > WIDTH-10 or balloon_x-25 < 10:
         balloon_x_speed *= -1
+    balloon_x += balloon_x_speed
     balloon_x_switcher = random.randrange(0,50)
     if balloon_x_switcher == 0:
         balloon_x_speed *=-1
-    balloon_x += balloon_x_speed
     
-    if balloon_y+12.5 >= 300 or balloon_y-12.5 <= 0:
+    if balloon_y+25 > 300 or balloon_y-25 < 10:
         balloon_y_speed *= -1
+    balloon_y += balloon_y_speed
     balloon_y_switcher = random.randrange(0,50)
     if balloon_y_switcher == 0:
         balloon_y_speed *=-1
-    balloon_y += balloon_y_speed
+        #Balloon 2
+    if balloon_2_x+25 > WIDTH-10 or balloon_2_x-25 < 10:
+        balloon_2_x_speed *= -1
+    balloon_2_x += balloon_2_x_speed
+    balloon_2_x_switcher = random.randrange(0,50)
+    if balloon_2_x_switcher == 0:
+        balloon_2_x_speed *=-1
+    
+    if balloon_2_y+25 > 300 or balloon_2_y-25 < 10:
+        balloon_2_y_speed *= -1
+    balloon_2_y += balloon_2_y_speed
+    balloon_2_y_switcher = random.randrange(0,50)
+    if balloon_2_y_switcher == 0:
+        balloon_2_y_speed *=-1
+        #Balloon 3
+    if balloon_3_x+25 > WIDTH-10 or balloon_3_x-25 < 10:
+        balloon_3_x_speed *= -1
+    balloon_3_x += balloon_3_x_speed
+    balloon_3_x_switcher = random.randrange(0,50)
+    if balloon_3_x_switcher == 0:
+        balloon_3_x_speed *=-1
+    
+    if balloon_3_y+25 > 300 or balloon_3_y-25 < 10:
+        balloon_3_y_speed *= -1
+    balloon_3_y += balloon_3_y_speed
+    balloon_3_y_switcher = random.randrange(0,50)
+    if balloon_3_y_switcher == 0:
+        balloon_3_y_speed *=-1
+        #Balloon 4
+    if balloon_4_x+25 > WIDTH-10 or balloon_4_x-25 < 10:
+        balloon_4_x_speed *= -1
+    balloon_4_x += balloon_4_x_speed
+    balloon_4_x_switcher = random.randrange(0,50)
+    if balloon_4_x_switcher == 0:
+        balloon_4_x_speed *=-1
+    
+    if balloon_4_y+25 > 300 or balloon_4_y-25 < 10:
+        balloon_4_y_speed *= -1
+    balloon_4_y += balloon_4_y_speed
+    balloon_4_y_switcher = random.randrange(0,50)
+    if balloon_4_y_switcher == 0:
+        balloon_4_y_speed *=-1
+        #Balloon 5
+    if balloon_5_x+25 > WIDTH-10 or balloon_5_x-25 < 10:
+        balloon_5_x_speed *= -1
+    balloon_5_x += balloon_5_x_speed
+    balloon_5_x_switcher = random.randrange(0,50)
+    if balloon_5_x_switcher == 0:
+        balloon_5_x_speed *=-1
+    
+    if balloon_5_y+25 > 300 or balloon_5_y-25 < 10:
+        balloon_5_y_speed *= -1
+    balloon_5_y += balloon_5_y_speed
+    balloon_5_y_switcher = random.randrange(0,50)
+    if balloon_5_y_switcher == 0:
+        balloon_5_y_speed *=-1
+        # ADD A TELEPORTER FOR WHEN THE SWITCH NEEDS TO HAPPEN
     # DRAWING
     screen.fill((255, 255, 255))  # always the first drawing command
     # Clown
@@ -118,13 +154,42 @@ while running:
     # Darts
     for center in darts:
         pygame.draw.ellipse(screen, (0,0,0), (center[0],center[1],5,10))
-    # Ballons
+    # Balloons
+        #Balloon 1
     pygame.draw.polygon(screen, (255,0,0), [(balloon_x-10,balloon_y+35),(balloon_x, balloon_y+5),(balloon_x+10, balloon_y+35)], width=0)
     pygame.draw.circle(screen, (255,0,0), (balloon_x,balloon_y),25)
     pygame.draw.line(screen, (0,0,0), (balloon_x,balloon_y+35),(balloon_x,balloon_y+40),width=1)
     pygame.draw.line(screen, (0,0,0), (balloon_x,balloon_y+40),(balloon_x-5,balloon_y+45),width=1)
     pygame.draw.line(screen, (0,0,0), (balloon_x-5,balloon_y+45),(balloon_x-5,balloon_y+55),width=1)
     pygame.draw.line(screen, (0,0,0), (balloon_x-5,balloon_y+55),(balloon_x-2,balloon_y+65),width=1)
+        #Balloon 2
+    pygame.draw.polygon(screen, (255,0,0), [(balloon_2_x-10,balloon_2_y+35),(balloon_2_x, balloon_2_y+5),(balloon_2_x+10, balloon_2_y+35)], width=0)
+    pygame.draw.circle(screen, (255,0,0), (balloon_2_x,balloon_2_y),25)
+    pygame.draw.line(screen, (0,0,0), (balloon_2_x,balloon_2_y+35),(balloon_2_x,balloon_2_y+40),width=1)
+    pygame.draw.line(screen, (0,0,0), (balloon_2_x,balloon_2_y+40),(balloon_2_x-5,balloon_2_y+45),width=1)
+    pygame.draw.line(screen, (0,0,0), (balloon_2_x-5,balloon_2_y+45),(balloon_2_x-5,balloon_2_y+55),width=1)
+    pygame.draw.line(screen, (0,0,0), (balloon_2_x-5,balloon_2_y+55),(balloon_2_x-2,balloon_2_y+65),width=1)
+        #Balloon 3
+    pygame.draw.polygon(screen, (255,0,0), [(balloon_3_x-10,balloon_3_y+35),(balloon_3_x, balloon_3_y+5),(balloon_3_x+10, balloon_3_y+35)], width=0)
+    pygame.draw.circle(screen, (255,0,0), (balloon_3_x,balloon_3_y),25)
+    pygame.draw.line(screen, (0,0,0), (balloon_3_x,balloon_3_y+35),(balloon_3_x,balloon_3_y+40),width=1)
+    pygame.draw.line(screen, (0,0,0), (balloon_3_x,balloon_3_y+40),(balloon_3_x-5,balloon_3_y+45),width=1)
+    pygame.draw.line(screen, (0,0,0), (balloon_3_x-5,balloon_3_y+45),(balloon_3_x-5,balloon_3_y+55),width=1)
+    pygame.draw.line(screen, (0,0,0), (balloon_3_x-5,balloon_3_y+55),(balloon_3_x-2,balloon_3_y+65),width=1)
+        #Balloon 4
+    pygame.draw.polygon(screen, (255,0,0), [(balloon_4_x-10,balloon_4_y+35),(balloon_4_x, balloon_4_y+5),(balloon_4_x+10, balloon_4_y+35)], width=0)
+    pygame.draw.circle(screen, (255,0,0), (balloon_4_x,balloon_4_y),25)
+    pygame.draw.line(screen, (0,0,0), (balloon_4_x,balloon_4_y+35),(balloon_4_x,balloon_4_y+40),width=1)
+    pygame.draw.line(screen, (0,0,0), (balloon_4_x,balloon_4_y+40),(balloon_4_x-5,balloon_4_y+45),width=1)
+    pygame.draw.line(screen, (0,0,0), (balloon_4_x-5,balloon_4_y+45),(balloon_4_x-5,balloon_4_y+55),width=1)
+    pygame.draw.line(screen, (0,0,0), (balloon_4_x-5,balloon_4_y+55),(balloon_4_x-2,balloon_4_y+65),width=1)
+        #Balloon 5
+    pygame.draw.polygon(screen, (255,0,0), [(balloon_5_x-10,balloon_5_y+35),(balloon_5_x, balloon_5_y+5),(balloon_5_x+10, balloon_5_y+35)], width=0)
+    pygame.draw.circle(screen, (255,0,0), (balloon_5_x,balloon_5_y),25)
+    pygame.draw.line(screen, (0,0,0), (balloon_5_x,balloon_5_y+35),(balloon_5_x,balloon_5_y+40),width=1)
+    pygame.draw.line(screen, (0,0,0), (balloon_5_x,balloon_5_y+40),(balloon_5_x-5,balloon_5_y+45),width=1)
+    pygame.draw.line(screen, (0,0,0), (balloon_5_x-5,balloon_5_y+45),(balloon_5_x-5,balloon_5_y+55),width=1)
+    pygame.draw.line(screen, (0,0,0), (balloon_5_x-5,balloon_5_y+55),(balloon_5_x-2,balloon_5_y+65),width=1)
     # Must be the last two lines
     # of the game loop
     pygame.display.flip()
