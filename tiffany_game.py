@@ -2,7 +2,6 @@
 # circus end point
 
 import pygame
-import math
 
 pygame.init()
 
@@ -14,18 +13,29 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 clock = pygame.time.Clock()
 
 #clown presets
-clown_x = 0
-clown_y = 0
+clown_x = 50
+clown_y = 50
 clown_radius = 20
+clown_y_change = 0
+x_pos_tile = 0
+y_pos_tile = 0
 
 #moving [W, A, S, D]
 moving = [0, 0, 0, 0]
 shrunk = False
 
-#platforms
-platform = [[0, 380, 640, 100], [0, 200, 80, 20], [300, 200, 10, 10]]
-closest = 0
-distance_final = 100000000000
+#tiles (all_tiles is in rows and columns)
+tile_size = 64
+all_tiles = [
+    [0 for i in range(10)],
+    [1, 1, 1, 1, 0, 0, 0, 0, 0, 0],
+    [0 for i in range(10)],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 1, 1, 1, 0, 0, 0, 0],
+    [0 for i in range (10)],
+    [1 for i in range(10)],
+    [1 for i in range(10)]
+    ]
 
 running = True
 
@@ -79,25 +89,21 @@ while running:
         clown_x += 5
 
     
-    #gravity settings
-    distance_final = 10000
-    for i in range(len(platform)):
-
-        # if clown_y - clown_radius > platform[i][1] + platform[i][3]:
-        #     distance_final = 100000
-
-        distance = math.sqrt((platform[i][0] - clown_x)**2 + (platform[i][1] - clown_y)**2)
-        print("c", closest, distance, distance_final)
-
-        if distance <= distance_final:
-            distance_final = distance
-            closest = i
+    #gravity settings --- need to check which multiple of 64 the clown is between
+    for i in range(WIDTH//64):
+        if clown_x > 64*i and clown_x < 64*(i+1):
+            x_pos_tile = i
         
-    if clown_y + clown_radius < platform[closest][1] or clown_y - clown_radius > platform[closest][1] + platform[closest][3]:
-        clown_y += 5
-    elif (clown_x > platform[closest][0] + platform[closest][2]) or (clown_x < platform[closest][0]):
-        clown_y += 5
+    for i in range(HEIGHT//64):
+        if clown_y > 64*i and clown_y < 64*(i+1):
+            y_pos_tile = i
 
+    clown_y += clown_y_change
+    if all_tiles[(HEIGHT // clown_y)][(WIDTH // clown_x)] == 1: #logic faulty
+        clown_y_change = 0
+    
+    else:
+        clown_y_change = 0.5
 
     #DRAWING
     #draw the clown
@@ -106,8 +112,10 @@ while running:
     pygame.draw.circle(screen, (0, 0, 0), (clown_x+10, clown_y), clown_radius - 15) #right eye
     pygame.draw.circle(screen, (255, 100, 100), (clown_x, clown_y+10), clown_radius - 15) #nose
 
-    for i in range(len(platform)):
-        pygame.draw.rect(screen, (100, 100, 0), platform[i])
+    for i in range(len(all_tiles)):
+        for a in range(len(all_tiles[i])):
+            if all_tiles[i][a] != 0:
+                pygame.draw.rect(screen, (100, 100, 0), [a*64, i*64, 64, 64])
 
 
     pygame.display.flip()
