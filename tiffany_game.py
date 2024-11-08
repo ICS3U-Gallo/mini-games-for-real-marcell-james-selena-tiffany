@@ -7,14 +7,14 @@ pygame.init()
 
 
 WIDTH = 640
-HEIGHT = 480
+HEIGHT = 448
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 clock = pygame.time.Clock()
 
 #clown presets
 clown_x = 50
-clown_y = 50
+clown_y = 0
 clown_radius = 20
 clown_y_change = 0
 x_pos_tile = 0
@@ -31,7 +31,7 @@ all_tiles = [
     [1, 1, 1, 1, 0, 0, 0, 0, 0, 0],
     [0 for i in range(10)],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 1, 1, 1, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0 for i in range (10)],
     [1 for i in range(10)],
     [1 for i in range(10)]
@@ -89,21 +89,22 @@ while running:
         clown_x += 5
 
     
-    #gravity settings --- need to check which multiple of 64 the clown is between
-    for i in range(WIDTH//64):
-        if clown_x > 64*i and clown_x < 64*(i+1):
+    #gravity settings --- need to check which multiple of 64 (tile_size) the clown is between
+    for i in range(WIDTH//tile_size):
+        if clown_x > tile_size*i and clown_x < tile_size*(i+1):
             x_pos_tile = i
         
-    for i in range(HEIGHT//64):
-        if clown_y > 64*i and clown_y < 64*(i+1):
+    for i in range(HEIGHT//tile_size):
+        if clown_y > tile_size*i and clown_y < tile_size*(i+1):
             y_pos_tile = i
 
     clown_y += clown_y_change
-    if all_tiles[(HEIGHT // clown_y)][(WIDTH // clown_x)] == 1: #logic faulty
+
+    if all_tiles[y_pos_tile+1][x_pos_tile] == 1 and y_pos_tile*tile_size+tile_size - clown_y-clown_radius <= 2:
         clown_y_change = 0
     
     else:
-        clown_y_change = 0.5
+        clown_y_change = 5
 
     #DRAWING
     #draw the clown
@@ -112,10 +113,11 @@ while running:
     pygame.draw.circle(screen, (0, 0, 0), (clown_x+10, clown_y), clown_radius - 15) #right eye
     pygame.draw.circle(screen, (255, 100, 100), (clown_x, clown_y+10), clown_radius - 15) #nose
 
-    for i in range(len(all_tiles)):
-        for a in range(len(all_tiles[i])):
+    for i in range(len(all_tiles)): #y_pos
+        for a in range(len(all_tiles[i])): #x_pos
             if all_tiles[i][a] != 0:
-                pygame.draw.rect(screen, (100, 100, 0), [a*64, i*64, 64, 64])
+                pygame.draw.rect(screen, (100, 100, 0), [a*tile_size, i*tile_size, tile_size, tile_size])
+                pygame.draw.line(screen, (0, 0, 0), (a*tile_size, i*tile_size), (a*tile_size+tile_size, i*tile_size), 3)
 
 
     pygame.display.flip()
