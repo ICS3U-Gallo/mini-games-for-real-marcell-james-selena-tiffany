@@ -25,17 +25,27 @@ moving = [0, 0, 0, 0]
 shrunk = False
 
 #tiles (all_tiles is in rows and columns)
-tile_size = 64
+tile_size = 32
 all_tiles = [
-    [0 for i in range(10)],
-    [1, 1, 1, 1, 0, 0, 0, 0, 0, 0],
-    [0 for i in range(10)],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0 for i in range (10)],
-    [1 for i in range(10)],
-    [1 for i in range(10)]
+    [0 for i in range(20)],
+    [1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0 for i in range(20)],
+    [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0 for i in range(20)],
+    [0 for i in range (20)],
+    [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1],
+    [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1],
+    [0 for i in range(20)],
+    [1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0 for i in range(20)],
+    [0 for i in range(20)],
+    [1 for i in range(20)],
+    [1 for i in range(20)]
     ]
+on_tile = False
+
+#end point
+end_rect = [290, 70, 30, 30]
 
 running = True
 
@@ -49,8 +59,8 @@ while running:
         # pressed a key
         elif event.type == pygame.KEYDOWN:
             # able to press multiple keys and move in two directions at once
-            if event.key == pygame.K_w:
-                clown_y -= 20
+            if event.key == pygame.K_w and on_tile == True:
+                clown_y -= 80
             if event.key == pygame.K_a:
                 moving[1] = 1 
             if event.key == pygame.K_s:
@@ -88,7 +98,6 @@ while running:
     if moving[3] == 1: #D - move right
         clown_x += 5
 
-    
     #gravity settings --- need to check which multiple of 64 (tile_size) the clown is between
     for i in range(WIDTH//tile_size):
         if clown_x > tile_size*i and clown_x < tile_size*(i+1):
@@ -102,9 +111,15 @@ while running:
 
     if all_tiles[y_pos_tile+1][x_pos_tile] == 1 and y_pos_tile*tile_size+tile_size - clown_y-clown_radius <= 2:
         clown_y_change = 0
+        on_tile = True
     
     else:
-        clown_y_change = 5
+        clown_y_change = 9
+        on_tile = False
+    
+    #checks if clown player is touching the endpoint
+    if clown_x > end_rect[0] and clown_x < end_rect[0] + end_rect[2] and clown_y >= end_rect[1] and clown_y <= end_rect[1] + end_rect[3]:
+        print("Reached End Point")
 
     #DRAWING
     #draw the clown
@@ -117,7 +132,8 @@ while running:
         for a in range(len(all_tiles[i])): #x_pos
             if all_tiles[i][a] != 0:
                 pygame.draw.rect(screen, (100, 100, 0), [a*tile_size, i*tile_size, tile_size, tile_size])
-                pygame.draw.line(screen, (0, 0, 0), (a*tile_size, i*tile_size), (a*tile_size+tile_size, i*tile_size), 3)
+
+    pygame.draw.rect(screen, (0, 0, 0), end_rect)
 
 
     pygame.display.flip()
