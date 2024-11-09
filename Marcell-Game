@@ -70,17 +70,25 @@ while running:
         #Balloon 1
     if balloon_x+25 > WIDTH-10 or balloon_x-25 < 10:
         balloon_x_speed *= -1
+        print(f"X WALL BOUNCE {balloon_x_speed}")
     balloon_x += balloon_x_speed
+    print(f"X MOVEMENT {balloon_x}")
     balloon_x_switcher = random.randrange(0,50)
+    # print(balloon_x_switcher)
     if balloon_x_switcher == 0:
         balloon_x_speed *=-1
+        print(f"RANDOM X SWITCH {balloon_x_speed}")
     
     if balloon_y+25 > 300 or balloon_y-25 < 10:
         balloon_y_speed *= -1
+        print(f"Y WALL BOUNCE {balloon_y_speed}")
     balloon_y += balloon_y_speed
+    print(F"Y MOVEMENT {balloon_y}")
     balloon_y_switcher = random.randrange(0,50)
+    # print(balloon_y_switcher)
     if balloon_y_switcher == 0:
         balloon_y_speed *=-1
+        print(f"RANDOM Y SWITCH {balloon_y_speed}")
         #Balloon 2
     if balloon_2_x+25 > WIDTH-10 or balloon_2_x-25 < 10:
         balloon_2_x_speed *= -1
@@ -137,9 +145,17 @@ while running:
     balloon_5_y_switcher = random.randrange(0,50)
     if balloon_5_y_switcher == 0:
         balloon_5_y_speed *=-1
-        # ADD A TELEPORTER FOR WHEN THE SWITCH NEEDS TO HAPPEN
     # DRAWING
     screen.fill((255, 255, 255))  # always the first drawing command
+    # Background
+    pygame.draw.rect(screen, (160,105,25), (0,350,WIDTH,180)) #Floor
+    pygame.draw.rect(screen, (120,0,0), (0,0,WIDTH,350)) # Red Tent
+    pygame.draw.polygon(screen, (205,133,63), [(0,0), (0,300), (125,0)],width=0) #Brown Coloring 1
+    pygame.draw.polygon(screen, (205,133,63), [(200,0), (150,350), (300,350), (350,0)],width=0) #Brown Coloring 2
+    pygame.draw.polygon(screen, (205,133,63), [(425,0), (450,350), (600,350), (525,0)],width=0) #Brown Coloring 3
+    pygame.draw.polygon(screen, (205,133,63), [(600,0), (680, 300), (WIDTH,0)],width=0) #Brown Coloring 4
+    # Ugly ass background must change
+    
     # Clown
     pygame.draw.circle(screen, (250,240,230), (player_x, player_y), 35) # Face
     pygame.draw.circle(screen, (0,0,0), (player_x-10, player_y-10), 7) # Eye 1
