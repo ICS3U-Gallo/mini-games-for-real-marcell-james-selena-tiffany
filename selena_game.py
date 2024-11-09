@@ -21,11 +21,19 @@ going_left = False
 jumping = False 
 jump_speed = 12 
 tire_list = [] 
+tire_rects = [] 
+check_list = [] 
 for i in range(10): 
     tire_x = random.randrange(100, WIDTH)
     tire_y = random.randrange(-600, -30) 
     tire = [tire_x, tire_y]
     tire_list.append(tire)
+    tire_rect_x = tire_x - 25
+    tire_rect_y = tire_y - 25 
+    tire_rect = [tire_rect_x, tire_rect_y]
+    tire_rects.append(tire_rect)
+
+# 30 radius 
 
 roll_x = -100 
 
@@ -63,11 +71,32 @@ while running:
     if char_y > 400: 
         jumping = False 
     
+    # for item in tire_list: 
+    #     item[1] += 7 
+    #     if item[1] > HEIGHT + 50: 
+    #         item[0] = random.randrange(100, WIDTH)
+    #         item[1] = random.randrange(-100, -30)
+    
+    for i in range(len(tire_list)): 
+        tire_list[i][1] += 7 
+        tire_rects[i][1] += 7
+        if tire_list[i][1] > HEIGHT + 50: 
+            new_x = random.randrange(100, WIDTH) 
+            new_y = random.randrange(-100, -30) 
+            tire_list[i][0] = new_x 
+            tire_list[i][1] = new_y
+            tire_rects[i][0] = new_x - 25 
+            tire_rects[i][1] = new_y - 25
+
+    for item in tire_rects: 
+        rect = pygame.Rect(item[0], item[1], 50, 50)
+        check_list.append(rect)
+
+    char_rect = pygame.Rect(char_x - 30, char_y - 30, 60, 60)
+
     for item in tire_list: 
-        item[1] += 7 
-        if item[1] > HEIGHT + 50: 
-            item[0] = random.randrange(100, WIDTH)
-            item[1] = random.randrange(-100, -30)
+        if char_rect.collidepoint(item[0], item[1]): 
+            print("collided") 
 
     chance = random.randrange(100)
     if chance == 1 and roll_x < -100: 
@@ -106,6 +135,11 @@ while running:
     pygame.draw.circle(screen, (0, 0, 0), (roll_x, 450), 25)
     pygame.draw.circle(screen, (128, 128, 128), (roll_x, 450), 20)
     pygame.draw.circle(screen, (0, 0, 0), (roll_x, 450), 10)
+
+    # for item in tire_list: 
+    #     pygame.draw.rect(screen, (0, 255, 0), (item[0], item[1], 50, 50))
+
+    # pygame.draw.rect(screen, (0, 255, 0), (char_x - 30, char_y - 30, 60, 60))
 
     # Must be the last two lines
     # of the game loop
