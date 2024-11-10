@@ -21,6 +21,8 @@ going_right = False
 going_left = False 
 jumping = False 
 jump_speed = 12 
+char_colour = (255, 225, 200)
+flash_start = 0 
 
 # Tire variables 
 tire_list = [] 
@@ -58,19 +60,25 @@ while running:
     # GAME STATE UPDATES
     # All game math and comparisons happen here
 
-    # Character moving 
+    # Character moving left and right 
     if going_right == True: 
         char_x += 10 
     if going_left == True: 
         char_x -= 10 
+    
+    # Character jumping 
     if jumping == True: 
         char_y += jump_speed
     if char_y < 340: 
         jump_speed *= -1
     if char_y > 400: 
         jumping = False 
+    
+    # Make sure character can't go completely off screen
     if char_x < 0: 
         char_x = 0 
+    
+    char_rect = pygame.Rect(char_x - 40, char_y - 40, 80, 70)
     
     # Tires moving 
     for i in range(len(tire_list)): 
@@ -83,20 +91,34 @@ while running:
             tire_list[i][0] = new_x 
             tire_list[i][1] = new_y 
 
-    # Cheking for collision between character and tires 
-    char_rect = pygame.Rect(char_x - 40, char_y - 40, 80, 70)
-
+    # Checking for collision between character and falling tires 
+    # Brings character back to starting point and turns them red for a second 
     for item in tire_rects: 
         if char_rect.colliderect(item): 
+            char_colour = (255, 80, 80)
             char_x = 0 
             char_y = 400
+            flash_start = pygame.time.get_ticks() 
 
     # A random chance that a tire might roll on the ground towards the character  
-    chance = random.randrange(75)
+    chance = random.randrange(100)
     if chance == 1 and roll_x < -100: 
         roll_x = 700
 
     roll_x -= 15 
+    roll_rect = pygame.Rect(roll_x - 20, 420, 40, 40)
+
+    # Checking for collision between character and the rolling tire
+    # Brings character back to starting point and turns them red for a second 
+    if char_rect.colliderect(roll_rect): 
+        char_colour = (255, 80, 80)
+        char_x = 0 
+        char_y = 400 
+        flash_start = pygame.time.get_ticks() 
+
+    # Turns character back to normal colour after getting hit 
+    if pygame.time.get_ticks() - flash_start > 200: 
+        char_colour = (255, 225, 200)
 
     # DRAWING
     screen.fill((175, 25, 25))  # always the first drawing command
@@ -107,7 +129,7 @@ while running:
     pygame.draw.circle(screen, (175, 100, 50), (WIDTH/2, HEIGHT + 550), 700)
 
     # Drawing the clown
-    pygame.draw.circle(screen, (255, 225, 200), (char_x, char_y), 35)
+    pygame.draw.circle(screen, char_colour, (char_x, char_y), 35)
     pygame.draw.circle(screen, (255, 0, 0), (char_x, char_y + 5), 10)
     pygame.draw.circle(screen, (0, 0, 0), (char_x - 15, char_y - 13), 5)
     pygame.draw.circle(screen, (0, 0, 0), (char_x + 15, char_y - 13), 5)
@@ -126,9 +148,9 @@ while running:
         pygame.draw.circle(screen, (0, 0, 0), (item[0], item[1]), 15)
     
     # Drawing the tire rolling on the ground 
-    pygame.draw.circle(screen, (0, 0, 0), (roll_x, 450), 25)
-    pygame.draw.circle(screen, (128, 128, 128), (roll_x, 450), 20)
-    pygame.draw.circle(screen, (0, 0, 0), (roll_x, 450), 10)
+    pygame.draw.circle(screen, (0, 0, 0), (roll_x, 440), 25)
+    pygame.draw.circle(screen, (128, 128, 128), (roll_x, 440), 20)
+    pygame.draw.circle(screen, (0, 0, 0), (roll_x, 440), 10)
 
     # Must be the last two lines
     # of the game loop
