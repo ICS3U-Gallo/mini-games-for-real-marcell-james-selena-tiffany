@@ -55,6 +55,11 @@ explosion_count = 0
 game_end = False
 
 darts = []
+
+def draw_text(text, font, text_col, x, y):
+    img = font.render(text, True, text_col)
+    screen.blit(img, (x,y))
+text_font = pygame.font.SysFont("Arial", 30)
 # ---------------------------
 
 running = True
@@ -67,52 +72,45 @@ while running:
             if event.key == pygame.K_SPACE:
                 dart = [player_x,player_y-25]
                 darts.append(dart)
-        elif event.type == pygame.MOUSEBUTTONDOWN:
-            print(event)
-
     # GAME STATE UPDATES
     # All game math and comparisons happen here
-
-    # Darts    
+    # Darts  
     for pos in darts:
         pos[1] -= 30
-        for i in pos:
-            if pos[1] <= balloon_y+30 and pos[1] >= balloon_y-30 and pos[0] >= balloon_x-30 and pos[0] <= balloon_x+30: 
-                score += 1
-                pos[0] = 1000
-                pos[1] = 1000
-                balloon_x = random.randrange(50,600,10)
-                balloon_y = random.randrange(50,230,10)
-            if pos[1] <= balloon_2_y+30 and pos[1] >= balloon_2_y-30 and pos[0] >= balloon_2_x-30 and pos[0] <= balloon_2_x+30:
-                score += 1
-                pos[0] = 1000
-                pos[1] = 1000
-                balloon_2_x = random.randrange(50,600,10)
-                balloon_2_y = random.randrange(50,230,10)
-            if pos[1] <= balloon_3_y+30 and pos[1] >= balloon_3_y-30 and pos[0] >= balloon_3_x-30 and pos[0] <= balloon_3_x+30:
-                score += 1
-                pos[0] = 1000
-                pos[1] = 1000
-                balloon_3_x = random.randrange(50,600,10)
-                balloon_3_y = random.randrange(50,230,10)
-            if pos[1] <= balloon_4_y+30 and pos[1] >= balloon_4_y-30 and pos[0] >= balloon_4_x-30 and pos[0] <= balloon_4_x+30:
-                score += 1
-                pos[0] = 1000
-                pos[1] = 1000
-                balloon_4_x = random.randrange(50,600,10)
-                balloon_4_y = random.randrange(50,230,10)
-            if pos[1] <= balloon_5_y+30 and pos[1] >= balloon_5_y-30 and pos[0] >= balloon_5_x-30 and pos[0] <= balloon_5_x+30:
-                score += 1
-                pos[0] = 1000
-                pos[1] = 1000
-                balloon_5_x = random.randrange(50,600,10)
-                balloon_5_y = random.randrange(50,230,10)
-            if pos[1] <= bomb_y+50 and pos[1] >= bomb_y-50 and pos[0] >= bomb_x-50 and pos[0] <= bomb_x+50:
-                score = 0
-                pos[0] = 1000
-                pos[1] = 1000
-                explosion = True
-
+        if pos[1] <= balloon_y+30 and pos[1] >= balloon_y-30 and pos[0] >= balloon_x-30 and pos[0] <= balloon_x+30: 
+            score += 1
+            pos[0] = 1000
+            pos[1] = 1000
+            balloon_x = random.randrange(50,600,10)
+            balloon_y = random.randrange(50,230,10)
+        if pos[1] <= balloon_2_y+30 and pos[1] >= balloon_2_y-30 and pos[0] >= balloon_2_x-30 and pos[0] <= balloon_2_x+30:
+            score += 1
+            pos[0] = 1000
+            pos[1] = 1000
+            balloon_2_x = random.randrange(50,600,10)
+            balloon_2_y = random.randrange(50,230,10)
+        if pos[1] <= balloon_3_y+30 and pos[1] >= balloon_3_y-30 and pos[0] >= balloon_3_x-30 and pos[0] <= balloon_3_x+30:
+            score += 1
+            pos[0] = 1000
+            pos[1] = 1000
+            balloon_3_x = random.randrange(50,600,10)
+            balloon_3_y = random.randrange(50,230,10)
+        if pos[1] <= balloon_4_y+30 and pos[1] >= balloon_4_y-30 and pos[0] >= balloon_4_x-30 and pos[0] <= balloon_4_x+30:
+            score += 1
+            pos[0] = 1000
+            pos[1] = 1000
+            balloon_4_x = random.randrange(50,600,10)
+            balloon_4_y = random.randrange(50,230,10)
+        if pos[1] <= balloon_5_y+30 and pos[1] >= balloon_5_y-30 and pos[0] >= balloon_5_x-30 and pos[0] <= balloon_5_x+30:
+            score += 1
+            pos[0] = 1000
+            pos[1] = 1000
+            balloon_5_x = random.randrange(50,600,10)
+            balloon_5_y = random.randrange(50,230,10)
+        if pos[1] <= bomb_y+50 and pos[1] >= bomb_y-50 and pos[0] >= bomb_x-50 and pos[0] <= bomb_x+50:
+            pos[0] = 1000
+            pos[1] = 1000
+            explosion = True
     # Bomb
     bomb_x += bomb_x_speed
     if bomb_x >= WIDTH-50 or bomb_x <= 50:
@@ -120,10 +118,12 @@ while running:
     bomb_y += bomb_y_speed
     if bomb_y >= HEIGHT-50 or bomb_y <= 50:
         bomb_y_speed *= -1
+    bomb_hitbox = pygame.Rect(bomb_x-45,bomb_y-45,90,90)
     # Mouse Control
     mouse_x, mouse_y = pygame.mouse.get_pos()
     player_x = mouse_x
     player_y = mouse_y
+    player_hitbox = pygame.Rect(player_x-35,player_y-35,70,70)
     #Balloons
         #Balloon 1
     if balloon_x+30 == WIDTH or balloon_x-30 == 0:
@@ -205,6 +205,11 @@ while running:
     if balloon_5_y_switcher == 0:
         balloon_5_y_speed *=-1
         balloon_5_y += balloon_5_y_speed
+        # Clown + Bomb Collision
+    if player_hitbox.colliderect(bomb_hitbox):
+        player_x = 1000
+        player_y = 1000
+        explosion = True
     # DRAWING
     screen.fill((255, 255, 255))  # always the first drawing command
     # Background
@@ -227,6 +232,7 @@ while running:
     pygame.draw.circle(screen, (255,0,255), (player_x, player_y-35), 15) # Hair
     pygame.draw.circle(screen, (255,255,0), (player_x+20, player_y-30), 15) # Hair
     pygame.draw.circle(screen, (0,255,255), (player_x+35, player_y-10), 15) # Hair
+    pygame.draw.rect(surface, (0,255,0,255), player_hitbox) # Hitbox
     # Darts
     for i in darts:
         pygame.draw.ellipse(screen, (0,0,0), (i[0],i[1],5,10))
@@ -237,6 +243,7 @@ while running:
     pygame.draw.rect(screen, (0,0,0), (bomb_x-20,bomb_y-60,40,15))
     pygame.draw.line(screen, (0,0,0), (bomb_x,bomb_y-60),(bomb_x,bomb_y-75),width=2)
     pygame.draw.line(screen, (0,0,0), (bomb_x,bomb_y-75),(bomb_x+10,bomb_y-85),width=2)
+    pygame.draw.rect(surface, (0,255,0,255), bomb_hitbox) #Hitbox
     # Balloons
         #Balloon 1
     pygame.draw.polygon(screen, (255,0,0), [(balloon_x-10,balloon_y+35),(balloon_x, balloon_y+5),(balloon_x+10, balloon_y+35)], width=0)
@@ -286,12 +293,10 @@ while running:
         pygame.draw.rect(screen, (255, 69, 0), (0,0,WIDTH,HEIGHT))
         print("Game Over")
         break
-
+    draw_text(f"Score: {score}", text_font, (0,0,0), 5,400)
     # Must be the last two lines
     # of the game loop
     pygame.display.flip()
     clock.tick(30)
     #---------------------------
-
-print(score)
 pygame.quit()
