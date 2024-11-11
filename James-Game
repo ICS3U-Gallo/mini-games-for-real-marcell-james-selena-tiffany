@@ -12,25 +12,37 @@ GRAVITY = 1
 JUMP_VELOCITY = -10
 GROUND_LEVEL = HEIGHT - 150
 
-
 screen = pygame.display.set_mode(SIZE)
 clock = pygame.time.Clock()
-fps = 120
+fps = 1000
 
 cloonie = pygame.image.load("cloonie.png")
 cloonie1 = pygame.transform.scale(cloonie, (40, 40))
 beckground = pygame.image.load("background.png")
 ground = pygame.image.load("ground.png")
 ground1 = pygame.transform.scale(ground, (700, 137))
+cannon = pygame.image.load("cannono.png")
+cannon1 = pygame.transform.scale(cannon, (40, 200))
+cannon2 = pygame.transform.flip(cannon1, False, True)
 image_rect = cloonie1.get_rect()
 image_rect.center = [150, 240]
+cannon2_y_position = 80
+pipe_gap = 100
+cannon_speed = 1
+cannon_direction = 1
+cannon1_rect = cannon1.get_rect()
+cannon1_rect.center = (360, 280 + int(pipe_gap / 2))
+cannon2_rect = cannon2.get_rect()
+cannon2_rect.center = (360, cannon2_y_position - int(pipe_gap / 2))
 ground_scroll = 0
 scroll_speed = 5
 velocity_y = 0
 
-
 # ---------------------------
 # Initialize global variables
+
+y_position = cannon2_y_position
+y_position += cannon_speed * cannon_direction
 
 velocity_y += 0.5
 if image_rect.bottom < 350:
@@ -66,13 +78,24 @@ while running:
     
     if image_rect.top <= -27:
         image_rect.top = -26
+    
+    if y_position <= 0:
+        cannon_direction = -1
+    elif y_position >= HEIGHT - cannon2_rect.height:
+        cannon_direction = 1
+
     # GAME STATE UPDATES
+
+
     # All game math and comparisons happen here
 
     # DRAWING
     screen.fill((255, 255, 255))  # always the first drawing command
     #background
     screen.blit(beckground, (0, 0))
+    #circus cannon
+    screen.blit(cannon1, cannon1_rect)
+    screen.blit(cannon2, cannon2_rect)
     #background and scroll
     screen.blit(ground1, (ground_scroll, 350))
     ground_scroll -= scroll_speed
@@ -80,10 +103,8 @@ while running:
         ground_scroll = 0
     #clown
     screen.blit(cloonie1, image_rect.center)
-    
-    
 
-
+    
     # Must be the last two lines
     # of the game loop
     pygame.display.flip()
