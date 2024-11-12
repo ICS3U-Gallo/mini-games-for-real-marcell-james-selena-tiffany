@@ -60,7 +60,7 @@ for i in range(len(all_tiles)):
 
 
 #end point
-end_rect = [270, 30, 70, 70]
+end_rect = [270, 320, 70, 70]
 win_time = 0 #time from win
 win_size = 50 #size of rectangle animation after win
 won_level_1 = False #level 1 done or not
@@ -82,13 +82,19 @@ help_goal = font.render("Goal: help the clown reach the circus tent!", True, (0,
 exit_window = font.render("Press ESC to exit this window", True, (0, 0, 0))
 
 #enemy
-enemy_pos = [[random.randint(0, WIDTH), 150]]
-time_since_action = [0]
-enemy_action = [0]
-enemy_on_tile = False
-x_pos_tile_enemy = 0
-y_pos_tile_enemy = 0
-enemy_y_change = 0
+enemy_pos = [[random.randint(0, WIDTH), 150, 20, 20] for i in range(4)]
+time_since_action = [0 for i in range(len(enemy_pos))]
+enemy_action = [0 for i in range(len(enemy_pos))]
+enemy_on_tile = [False for i in range(len(enemy_pos))]
+x_pos_tile_enemy = [0 for i in range(len(enemy_pos))]
+y_pos_tile_enemy = [0 for i in range(len(enemy_pos))]
+enemy_y_change = [0 for i in range(len(enemy_pos))]
+teleport = [0 for i in range(len(enemy_pos))]
+
+# dying variable (will show end screen)
+dead = False
+dead_text = font.render("You have died to your business rival: clown brother #1", True, (0, 0, 0))
+dead_is_True = 50
 
 running = True
 
@@ -103,17 +109,18 @@ while running:
         
         # pressed a key
         elif event.type == pygame.KEYDOWN:
-            if on_tile == True:
+            if help_open == False and dead == False:
             # able to press multiple keys and move in two directions at once
-                if event.key == pygame.K_w:
-                    started_w_time = current_time
-                    clown_y -= 50
+                if on_tile == True:
+                    if event.key == pygame.K_w:
+                        started_w_time = current_time
+                        clown_y -= 50
 
-                    for i in range(len(platforms)): #if collides with platform while jumping
-                        if clown_rect.colliderect(platforms[i]):
-                            clown_y += 2
+                        for i in range(len(platforms)): #if collides with platform while jumping
+                            if clown_rect.colliderect(platforms[i]):
+                                clown_y += 2
             
-            if help_open == False: #cannot win by pressing randomly while help window is open
+                #cannot win by pressing randomly while help window is open
                 if event.key == pygame.K_a:
                     moving[1] = 1 
                 if event.key == pygame.K_s:
@@ -166,8 +173,8 @@ while running:
             if maxed == True and win_size > 0: #need to reset all values again
                 win_size -= 5
                 level = 2
-                clown_x = 300
-                clown_y = 200
+                clown_x = 350
+                clown_y = 300
                 end_rect = [50, 50, 30, 30]
 
                 platforms = []
@@ -210,7 +217,7 @@ while running:
 
     
     #checks if tile below clown is a platform and clown's position is just above it    
-    if all_tiles[y_pos_tile+1][x_pos_tile] == 1 and y_pos_tile*tile_size <= clown_y+clown_radius + 5: 
+    if all_tiles[y_pos_tile+1][x_pos_tile] == 1 and y_pos_tile*tile_size <= clown_y+clown_radius: 
         clown_y_change = 0
         on_tile = True
 
@@ -231,37 +238,73 @@ while running:
     #GAME STATE UPDATES --- enemy:
 
     for i in range(len(time_since_action)):
-        if current_time - time_since_action[i] >= random.randint(1500, 2000):
-            enemy_action[i] = random.randint(0, 3) #an RNG with four possible actions
+        if current_time - time_since_action[i] >= 1000:
+            teleport[i] = random.randint(0, 20)
             time_since_action[i] = current_time
-        
-        print(enemy_action[i])
     
     for i in range(len(enemy_action)): # enemy random movements
-        if enemy_action[i] == 0 and enemy_pos[i][0] < WIDTH:
-            enemy_pos[i][0] += 3 # enemy moves right
-        elif enemy_action[i] == 1 and enemy_pos[i][0] > 0:
-            enemy_pos[i][0] -= 3 # enemy moves left
-        elif enemy_action[i] == 2:
-            enemy_pos[i][1] -= 20 # enemy jumps
-        elif enemy_action[i] == 3:
-            enemy_pos[i][0] = clown_x # teleports enemy to current position (auto lose)
-    
-        if enemy_pos[i][1] < 0:
-            enemy_pos[i][1] += 5
+        if level == 1 or (level == 2 and current_time - win_time == 3000):
+            if enemy_action[i] == 0 and enemy_pos[i][0] < WIDTH:
+                enemy_pos[i][0] += 3 # enemy moves right
+            elif enemy_action[i] == 1 and enemy_pos[i][0] > 0:
+                enemy_pos[i][0] -= 3 # enemy moves left
+            if teleport[i] == 2:
+                enemy_pos[i][0] = random.randint(0, WIDTH) # teleports enemy to random position if it hits the lucky chance
+                enemy_pos[i][1] = 50
+                teleport[i] = 40
         
-        enemy_pos[i][1] += enemy_y_change
-        enemy_y_change += gravity
+            if enemy_pos[i][1] < 0:
+                enemy_pos[i][1] += 5
+            
+            
+            # enemy gravity settings
+            enemy_pos[i][1] += enemy_y_change[i]
+            
 
-        for i in range(WIDTH//tile_size): # current x number tile clown is on
-            if enemy_pos[i][0] > tile_size*i and enemy_pos[i][0] < tile_size*(i+1):
-                x_pos_tile_enemy = i
+            for a in range(WIDTH//tile_size): # current x number tile clown is on
+                if enemy_pos[i][0] > tile_size*a and enemy_pos[i][0] < tile_size*(a+1):
+                    x_pos_tile_enemy[i] = a
+            
+            for a in range(HEIGHT//tile_size): # current y number tile clown is on
+                if enemy_pos[i][1]+20 > tile_size*a and enemy_pos[i][1]+20 < tile_size*(a+1):
+                    y_pos_tile_enemy[i] = a
+            
+            #makes enemy stand on platforms
+            if all_tiles[y_pos_tile_enemy[i]+1][x_pos_tile_enemy[i]] == 1 and enemy_pos[i][1] >= y_pos_tile_enemy[i]*tile_size:
+                enemy_y_change[i] = 0
+            
+            else:
+                enemy_y_change[i] += gravity
+
+            
+            # makes sure enemy doesn't go off the screen
+            if enemy_pos[i][0] + enemy_pos[i][2] > WIDTH:
+                enemy_pos[i][0] -= tile_size
+            elif enemy_pos[i][0] < 0:
+                enemy_pos[i][0] += tile_size
+            if enemy_pos[i][1] + enemy_pos[i][3] > HEIGHT:
+                enemy_pos[i][1] -= tile_size
+            elif enemy_pos[i][1] < 0:
+                enemy_pos[i][1] += tile_size
+            
+            if enemy_pos[i][0] + enemy_pos[i][2] >= WIDTH-tile_size:
+                enemy_action[i] = 1
+            elif enemy_pos[i][0] < 0:
+                enemy_action[i] = 0
         
-        for i in range(HEIGHT//tile_size): # current y number tile clown is on
-            if enemy_pos[i][1] > tile_size*i and enemy_pos[i][1] < tile_size*(i+1):
-                y_pos_tile_enemy = i
-    
-
+            enemy_rect = pygame.Rect(enemy_pos[i])
+        
+            
+            for a in range(len(platforms)): #checks for enemy collision with platforms so that enemy doesn't phase through them
+                if enemy_rect.colliderect(platforms[a]):
+                    if enemy_action[i] == 0 and all_tiles[y_pos_tile_enemy[i]][x_pos_tile_enemy[i]+1] == 1 and enemy_pos[i][0]+enemy_pos[i][2] < WIDTH-tile_size:
+                        enemy_action[i] = 1
+                        enemy_pos[i][0] -= 5
+                        print(enemy_action)
+                    elif enemy_action[i] == 1 and all_tiles[y_pos_tile_enemy[i]][x_pos_tile_enemy[i]-1] == 1 and enemy_pos[i][0] > 0:
+                        enemy_action[i] = 0
+                        enemy_pos[i][0] += 5
+            
 
     #DRAWING
     #draw the clown
@@ -277,7 +320,8 @@ while running:
     
     #draw the enemy
     for i in range(len(enemy_pos)):
-        pygame.draw.rect(screen, (255, 0, 0), (enemy_pos[i][0], enemy_pos[i][1], 20, 20))
+        if level == 1 or (level == 2 and current_time - win_time >= 3000):
+            pygame.draw.rect(screen, (255, 0, 0), (enemy_pos[i][0], enemy_pos[i][1], 20, 20))
 
     #how pygame.draw.rect(screen, (0, 0, 0), end_rect)
     screen.blit(circus_resized, pygame.Rect(end_rect))
@@ -318,6 +362,17 @@ while running:
         ]
 
 
+    if clown_rect.colliderect(enemy_rect):
+        dead = True #needed so that the rectangle doesn't disappear
+
+    #draws another rectangle increasing in size 
+    if dead == True and won_level_1 == False:
+        if current_time - win_time > 200 and dead_is_True <= WIDTH//2:
+            dead_is_True += 5
+        pygame.draw.rect(screen, (255, 0, 0), (WIDTH//2-dead_is_True, HEIGHT//2-dead_is_True+50, dead_is_True*2, dead_is_True*2-80))
+
+        if dead_is_True > WIDTH//2:
+            screen.blit(dead_text, (60, 200, 300, 100))
 
     pygame.display.flip()
     clock.tick(30)
