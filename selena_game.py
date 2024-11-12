@@ -38,10 +38,19 @@ for i in range(10):
 roll_x = -100 
 
 # System and text variables 
+welcome_screen = True 
 win = False 
-text_font = pygame.font.SysFont("Nunito", 48, False, False)
+text_font = pygame.font.SysFont("Nunito", 30, False, False)
 win_message = "Congrats! You got across the stage!"
 win_text = text_font.render(win_message, True, (0, 0, 0))
+welcome_message = "Uh oh, there are tires rolling and falling onto the stage!"
+welcome_text = text_font.render(welcome_message, True, (0, 0, 0))
+instructions_message = "Get across the stage by dodging the tires."
+instructions_text = text_font.render(instructions_message, True, (0, 0, 0))
+directions_message = "Use arrow keys to move left, move right, and jump."
+directions_text = text_font.render(directions_message, True, (0, 0, 0))
+click_message = "Click to begin." 
+click_text = text_font.render(click_message, True, (0, 0, 0))
 
 # ---------------------------
 
@@ -62,6 +71,8 @@ while running:
         elif event.type == pygame.KEYUP: 
             going_right = False 
             going_left = False 
+        elif event.type == pygame.MOUSEBUTTONDOWN: 
+            welcome_screen = False 
 
     # GAME STATE UPDATES
     # All game math and comparisons happen here
@@ -130,7 +141,7 @@ while running:
     if char_x > WIDTH: 
         win = True 
 
-    # DRAWING
+    # DRAWING 
     screen.fill((175, 25, 25))  # always the first drawing command
 
     # Drawing the background 
@@ -153,18 +164,23 @@ while running:
 
     # Drawing the tires falling down 
     for item in tire_list: 
-        pygame.draw.circle(screen, (0, 0, 0), (item[0], item[1]), 30)
-        pygame.draw.circle(screen, (128, 128, 128), (item[0], item[1]), 25)
-        pygame.draw.circle(screen, (0, 0, 0), (item[0], item[1]), 15)
+        pygame.draw.circle(screen, (0, 0, 0), (item[0], item[1]), 30, 20)
+        pygame.draw.circle(screen, (128, 128, 128), (item[0], item[1]), 20, 8)
     
     # Drawing the tire rolling on the ground 
-    pygame.draw.circle(screen, (0, 0, 0), (roll_x, 440), 25)
-    pygame.draw.circle(screen, (128, 128, 128), (roll_x, 440), 20)
-    pygame.draw.circle(screen, (0, 0, 0), (roll_x, 440), 10)
+    pygame.draw.circle(screen, (0, 0, 0), (roll_x, 440), 25, 15)
+    pygame.draw.circle(screen, (128, 128, 128), (roll_x, 440), 18, 6)
+
+    if welcome_screen == True: 
+        screen.fill((255, 210, 210))
+        screen.blit(welcome_text, (60, 100))
+        screen.blit(instructions_text, (100, 175))
+        screen.blit(directions_text, (80, 250))
+        screen.blit(click_text, (250, 325))
 
     if win == True: 
-        pygame.draw.rect(screen, (150, 255, 150), (0, 0, WIDTH, HEIGHT))
-        screen.blit(win_text, (35, 100))
+        screen.fill((150, 255, 150))
+        screen.blit(win_text, (125, 200))
 
     # Must be the last two lines
     # of the game loop
