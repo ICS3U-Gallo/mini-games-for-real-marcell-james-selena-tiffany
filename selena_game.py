@@ -37,6 +37,12 @@ for i in range(10):
 
 roll_x = -100 
 
+# System and text variables 
+win = False 
+text_font = pygame.font.SysFont("Nunito", 48, False, False)
+win_message = "Congrats! You got across the stage!"
+win_text = text_font.render(win_message, True, (0, 0, 0))
+
 # ---------------------------
 
 running = True
@@ -120,6 +126,10 @@ while running:
     if pygame.time.get_ticks() - flash_start > 200: 
         char_colour = (255, 225, 200)
 
+    # Win condition 
+    if char_x > WIDTH: 
+        win = True 
+
     # DRAWING
     screen.fill((175, 25, 25))  # always the first drawing command
 
@@ -151,6 +161,10 @@ while running:
     pygame.draw.circle(screen, (0, 0, 0), (roll_x, 440), 25)
     pygame.draw.circle(screen, (128, 128, 128), (roll_x, 440), 20)
     pygame.draw.circle(screen, (0, 0, 0), (roll_x, 440), 10)
+
+    if win == True: 
+        pygame.draw.rect(screen, (150, 255, 150), (0, 0, WIDTH, HEIGHT))
+        screen.blit(win_text, (35, 100))
 
     # Must be the last two lines
     # of the game loop
