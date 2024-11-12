@@ -21,25 +21,42 @@ cloonie1 = pygame.transform.scale(cloonie, (40, 40))
 beckground = pygame.image.load("background.png")
 ground = pygame.image.load("ground.png")
 ground1 = pygame.transform.scale(ground, (700, 137))
-cannon = pygame.image.load("cannono.png")
-cannon1 = pygame.transform.scale(cannon, (40, 200))
-cannon2 = pygame.transform.flip(cannon1, False, True)
 image_rect = cloonie1.get_rect()
-image_rect.center = [150, 240]
+image_rect.center = [100, 240]
 cannon2_y_position = 80
-pipe_gap = 100
+pipe_gap = 120
+pipe_frequency = 2000
+latest_pipe = pygame.time.get_ticks() - pipe_frequency
 cannon_speed = 1
 cannon_direction = 1
-cannon1_rect = cannon1.get_rect()
-cannon1_rect.center = (360, 280 + int(pipe_gap / 2))
-cannon2_rect = cannon2.get_rect()
-cannon2_rect.center = (360, cannon2_y_position - int(pipe_gap / 2))
 ground_scroll = 0
 scroll_speed = 5
+cannon_speed = 5
 velocity_y = 0
 
 # ---------------------------
 # Initialize global variables
+
+class Pipe(pygame.sprite.Sprite):
+    def __init__(self, x, y, position):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.image.load("cannono.png")
+        self.rect = self.image.get_rect()
+        if position == 1:
+            self.image = pygame.transform.flip(self.image, False, True)
+            self.rect.bottomleft = [x, y - int(pipe_gap)]
+        if position == -1:
+            self.rect.topleft = [x, y]
+    def update(self):
+        self.rect.x -= cannon_speed
+        if abs(self.rect.y) > 50:
+            scroll_speed = 5
+            self.rect.y -= scroll_speed
+        else:
+            scroll_speed = -5
+            self.rect.y -= scroll_speed
+
+pipe_group = pygame.sprite.Group()
 
 y_position = cannon2_y_position
 y_position += cannon_speed * cannon_direction
@@ -78,14 +95,17 @@ while running:
     
     if image_rect.top <= -27:
         image_rect.top = -26
+
+    time_now = pygame.time.get_ticks()
+    if time_now - latest_pipe > pipe_frequency:
+        btm_pipe = Pipe(WIDTH, int(HEIGHT / 2), -1)
+        top_pipe = Pipe(WIDTH, int(HEIGHT / 2), 1)
+        pipe_group.add(btm_pipe)
+        pipe_group.add(top_pipe)
+        latest_pipe = time_now
     
-    if y_position <= 0:
-        cannon_direction = -1
-    elif y_position >= HEIGHT - cannon2_rect.height:
-        cannon_direction = 1
 
     # GAME STATE UPDATES
-
 
     # All game math and comparisons happen here
 
@@ -94,8 +114,9 @@ while running:
     #background
     screen.blit(beckground, (0, 0))
     #circus cannon
-    screen.blit(cannon1, cannon1_rect)
-    screen.blit(cannon2, cannon2_rect)
+    pipe_group.draw(screen)
+    pipe_group.update()
+
     #background and scroll
     screen.blit(ground1, (ground_scroll, 350))
     ground_scroll -= scroll_speed
@@ -103,6 +124,7 @@ while running:
         ground_scroll = 0
     #clown
     screen.blit(cloonie1, image_rect.center)
+
 
     
     # Must be the last two lines
