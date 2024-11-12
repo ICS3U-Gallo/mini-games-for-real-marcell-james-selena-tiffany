@@ -8,13 +8,12 @@ HEIGHT = 480
 SIZE = (WIDTH, HEIGHT)
 
 screen = pygame.display.set_mode(SIZE)
-surface = pygame.Surface((SIZE), pygame.SRCALPHA)
 clock = pygame.time.Clock()
 # ---------------------------
 # Initialize global variables
 
-player_x = 200
-player_y = 200
+player_x = 320
+player_y = 420
 score = 0
 
 # Balloons
@@ -52,7 +51,13 @@ explosion_radius = 10
 explosion = False
 explosion_count = 0
 
+#Powerups
+laser_orb = False
+laser = False 
+laser_x = 1000
+laser_y = 1000
 game_end = False
+defusal = 0
 
 darts = []
 
@@ -74,35 +79,61 @@ while running:
                 darts.append(dart)
     # GAME STATE UPDATES
     # All game math and comparisons happen here
+    laser_orb_hitbox = pygame.Rect(laser_x,laser_y,20,20)
     # Darts  
     for pos in darts:
         pos[1] -= 30
         if pos[1] <= balloon_y+30 and pos[1] >= balloon_y-30 and pos[0] >= balloon_x-30 and pos[0] <= balloon_x+30: 
             score += 1
+            laser_orb_random = random.randrange(0,1)
+            if laser_orb_random == 0 and laser_y > HEIGHT:
+                laser_x = random.randrange(1,WIDTH-20)
+                laser_y = -20
+                laser_orb = True
             pos[0] = 1000
             pos[1] = 1000
             balloon_x = random.randrange(50,600,10)
             balloon_y = random.randrange(50,230,10)
         if pos[1] <= balloon_2_y+30 and pos[1] >= balloon_2_y-30 and pos[0] >= balloon_2_x-30 and pos[0] <= balloon_2_x+30:
             score += 1
+            laser_orb_random = random.randrange(0,30)
+            if laser_orb_random == 0 and laser_y > HEIGHT:
+                laser_x = random.randrange(1,WIDTH-20)
+                laser_y = -20
+                laser_orb = True
             pos[0] = 1000
             pos[1] = 1000
             balloon_2_x = random.randrange(50,600,10)
             balloon_2_y = random.randrange(50,230,10)
         if pos[1] <= balloon_3_y+30 and pos[1] >= balloon_3_y-30 and pos[0] >= balloon_3_x-30 and pos[0] <= balloon_3_x+30:
             score += 1
+            laser_orb_random = random.randrange(0,30)
+            if laser_orb_random == 0 and laser_y > HEIGHT:
+                laser_x = random.randrange(1,WIDTH-20)
+                laser_y = -20
+                laser_orb = True
             pos[0] = 1000
             pos[1] = 1000
             balloon_3_x = random.randrange(50,600,10)
             balloon_3_y = random.randrange(50,230,10)
         if pos[1] <= balloon_4_y+30 and pos[1] >= balloon_4_y-30 and pos[0] >= balloon_4_x-30 and pos[0] <= balloon_4_x+30:
             score += 1
+            laser_orb_random = random.randrange(0,30)
+            if laser_orb_random == 0 and laser_y > HEIGHT:
+                laser_x = random.randrange(1,WIDTH-20)
+                laser_y = -20
+                laser_orb = True
             pos[0] = 1000
             pos[1] = 1000
             balloon_4_x = random.randrange(50,600,10)
             balloon_4_y = random.randrange(50,230,10)
         if pos[1] <= balloon_5_y+30 and pos[1] >= balloon_5_y-30 and pos[0] >= balloon_5_x-30 and pos[0] <= balloon_5_x+30:
             score += 1
+            laser_orb_random = random.randrange(0,25)
+            if laser_orb_random == 0 and laser_y > HEIGHT:
+                laser_x = random.randrange(1,WIDTH-20)
+                laser_y = -20
+                laser_orb = True
             pos[0] = 1000
             pos[1] = 1000
             balloon_5_x = random.randrange(50,600,10)
@@ -118,12 +149,14 @@ while running:
     bomb_y += bomb_y_speed
     if bomb_y >= HEIGHT-50 or bomb_y <= 50:
         bomb_y_speed *= -1
-    bomb_hitbox = pygame.Rect(bomb_x-45,bomb_y-45,90,90)
+    bomb_hitbox = pygame.Rect(bomb_x-40,bomb_y-40,80,80)
     # Mouse Control
     mouse_x, mouse_y = pygame.mouse.get_pos()
     player_x = mouse_x
-    player_y = mouse_y
-    player_hitbox = pygame.Rect(player_x-35,player_y-35,70,70)
+    if laser == True:
+        player_hitbox = pygame.Rect(1000,player_y-30,60,60)
+    if laser == False:
+        player_hitbox = pygame.Rect(player_x-30,player_y-30,60,60)
     #Balloons
         #Balloon 1
     if balloon_x+30 == WIDTH or balloon_x-30 == 0:
@@ -210,6 +243,16 @@ while running:
         player_x = 1000
         player_y = 1000
         explosion = True
+        #Powerups
+    if laser_orb == True:
+        laser_y += 5
+    if laser_orb_hitbox.colliderect(player_hitbox):
+        laser_x = 1000
+        laser = True
+        defusal = pygame.time.get_ticks()
+    if pygame.time.get_ticks() - defusal > 5000:
+        laser = False
+
     # DRAWING
     screen.fill((255, 255, 255))  # always the first drawing command
     # Background
@@ -232,7 +275,6 @@ while running:
     pygame.draw.circle(screen, (255,0,255), (player_x, player_y-35), 15) # Hair
     pygame.draw.circle(screen, (255,255,0), (player_x+20, player_y-30), 15) # Hair
     pygame.draw.circle(screen, (0,255,255), (player_x+35, player_y-10), 15) # Hair
-    pygame.draw.rect(surface, (0,255,0,255), player_hitbox) # Hitbox
     # Darts
     for i in darts:
         pygame.draw.ellipse(screen, (0,0,0), (i[0],i[1],5,10))
@@ -243,7 +285,6 @@ while running:
     pygame.draw.rect(screen, (0,0,0), (bomb_x-20,bomb_y-60,40,15))
     pygame.draw.line(screen, (0,0,0), (bomb_x,bomb_y-60),(bomb_x,bomb_y-75),width=2)
     pygame.draw.line(screen, (0,0,0), (bomb_x,bomb_y-75),(bomb_x+10,bomb_y-85),width=2)
-    pygame.draw.rect(surface, (0,255,0,255), bomb_hitbox) #Hitbox
     # Balloons
         #Balloon 1
     pygame.draw.polygon(screen, (255,0,0), [(balloon_x-10,balloon_y+35),(balloon_x, balloon_y+5),(balloon_x+10, balloon_y+35)], width=0)
@@ -280,6 +321,10 @@ while running:
     pygame.draw.line(screen, (0,0,0), (balloon_5_x,balloon_5_y+40),(balloon_5_x-5,balloon_5_y+45),width=1)
     pygame.draw.line(screen, (0,0,0), (balloon_5_x-5,balloon_5_y+45),(balloon_5_x-5,balloon_5_y+55),width=1)
     pygame.draw.line(screen, (0,0,0), (balloon_5_x-5,balloon_5_y+55),(balloon_5_x-2,balloon_5_y+65),width=1)
+        # Powerups
+    pygame.draw.rect(screen, (0,0,255), laser_orb_hitbox)
+    if laser == True:
+        pygame.draw.circle(screen, (0,255,0), (player_x, player_y),60,width=7)
         # Explosion
     if explosion == True:
         pygame.time.wait(500)
@@ -292,6 +337,7 @@ while running:
     if game_end == True:
         pygame.draw.rect(screen, (255, 69, 0), (0,0,WIDTH,HEIGHT))
         print("Game Over")
+        print(score)
         break
     draw_text(f"Score: {score}", text_font, (0,0,0), 5,400)
     # Must be the last two lines
