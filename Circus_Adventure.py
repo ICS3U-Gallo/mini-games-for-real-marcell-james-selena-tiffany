@@ -18,9 +18,6 @@ clock = pygame.time.Clock()
 player_x = 320
 player_y = 420
 
-#Time
-start_time = pygame.time.get_ticks()
-
 # Balloons
 balloon_x = 100
 balloon_y = 100
