@@ -60,7 +60,7 @@ shield = False
 shield_x = 1000
 shield_y = 1000
 end_game = False
-defusal = 0
+shield_start_time = 0
 
 darts = []
 
@@ -69,7 +69,7 @@ score = 0
 def draw_text(text, font, text_col, x, y):
     img = font.render(text, True, text_col)
     screen.blit(img, (x,y))
-text_font = pygame.font.SysFont("Arial", 30)
+text_font = pygame.font.SysFont("Nunito", 40)
 
 #Initialization
 initalization = True
@@ -88,12 +88,17 @@ while running:
     # GAME STATE UPDATES
     # All game math and comparisons happen here
     if initalization == True:
-        draw_text("Pop 100 Balloons to Win!", text_font, (255,255,255), 180,190)
-        draw_text("Mouse to Move, SPACE to shoot!", text_font, (255,255,255), 140,220)
-        draw_text("Careful of the Bomb!", text_font, (255,255,255), 200,250)
+        draw_text("Pop 50 Balloons to Win!", text_font, (255,255,255), 150,190)
+        draw_text("Mouse to Move, SPACE to Shoot!", text_font, (255,255,255), 110,220)
+        draw_text("Careful of the Bomb!", text_font, (255,255,255), 170,250)
         if pygame.time.get_ticks() - initalization_start_time > 5000:
             initalization = False
-    if initalization == False:
+    if score >= 50:
+        bomb_x = -1000
+        bomb_x_speed = 0
+        pygame.draw.rect(screen, (0, 0, 0), (0,0,WIDTH,HEIGHT))
+        draw_text("Congratulations! You Won!!", text_font, (255,255,255), 140,220)
+    if initalization == False and score < 50:
         shield_orb_hitbox = pygame.Rect(shield_x,shield_y,20,20)
         # Darts  
         for pos in darts:
@@ -264,8 +269,8 @@ while running:
         if shield_orb_hitbox.colliderect(player_hitbox):
             shield_x = 1000
             shield = True
-            defusal = pygame.time.get_ticks()
-        if pygame.time.get_ticks() - defusal > 5000:
+            shield_start_time = pygame.time.get_ticks()
+        if pygame.time.get_ticks() - shield_start_time > 5000:
             shield = False
             #Explosion
         if explosion == True:
@@ -358,13 +363,6 @@ while running:
             pygame.time.wait(500)
             pygame.draw.circle(screen, (255,69,0), (bomb_x,bomb_y), explosion_radius)
             # Game End
-        if score == 10:
-            bomb_x = -1000
-            bomb_x_speed = 0
-            pygame.draw.rect(screen, (0, 0, 0), (0,0,WIDTH,HEIGHT))
-            draw_text("Congratulations! You Won!!", text_font, (255,255,255), 180,220)
-            # if pygame.time.get_ticks - 
-            # FIX
         draw_text(f"Score: {score}", text_font, (0,0,0), 5,400)
     # Must be the last two lines
     # of the game loop
