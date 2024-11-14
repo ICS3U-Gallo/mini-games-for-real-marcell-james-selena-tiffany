@@ -39,7 +39,7 @@ roll_x = -100
 
 # System and text variables 
 welcome_screen = True 
-win = False 
+win = False
 text_font = pygame.font.SysFont("Nunito", 30, False, False)
 win_message = "Congrats! You got across the stage!"
 win_text = text_font.render(win_message, True, (0, 0, 0))
@@ -171,16 +171,40 @@ while running:
     pygame.draw.circle(screen, (0, 0, 0), (roll_x, 440), 25, 15)
     pygame.draw.circle(screen, (128, 128, 128), (roll_x, 440), 18, 6)
 
+    # Display welcome screen 
     if welcome_screen == True: 
         screen.fill((255, 210, 210))
-        screen.blit(welcome_text, (60, 100))
-        screen.blit(instructions_text, (100, 175))
-        screen.blit(directions_text, (80, 250))
-        screen.blit(click_text, (250, 325))
+        # Banner decorations 
+        for i in range(0, WIDTH, 40): 
+            pygame.draw.polygon(screen, (255, 100, 100), ((i, 50), (i+30, 50), (i+15, 100)))
+        pygame.draw.line(screen, (0, 0, 0), (0, 50), (WIDTH, 50), 3)
+        # Tire decorations 
+        pygame.draw.circle(screen, (0, 0, 0), (100, 400), 30, 20)
+        pygame.draw.circle(screen, (128, 128, 128), (100, 400), 20, 8)
+        pygame.draw.circle(screen, (0, 0, 0), (550, 400), 30, 20)
+        pygame.draw.circle(screen, (128, 128, 128), (550, 400), 20, 8)
+        # Text instructions 
+        screen.blit(welcome_text, (60, 150))
+        screen.blit(instructions_text, (100, 225))
+        screen.blit(directions_text, (80, 300))
+        screen.blit(click_text, (250, 375))
 
+    # Display end screen after win
     if win == True: 
         screen.fill((150, 255, 150))
-        screen.blit(win_text, (125, 200))
+        # Banner decorations 
+        for i in range(0, WIDTH, 40): 
+            pygame.draw.polygon(screen, (0, 100, 0), ((i, 50), (i+30, 50), (i+15, 100)))
+        pygame.draw.line(screen, (0, 0, 0), (0, 50), (WIDTH, 50), 3)
+        # Balloon decorations 
+        pygame.draw.line(screen, (0, 0, 0), (80, 320), (80, 450))
+        pygame.draw.ellipse(screen, (0, 175, 255), (50, 250, 60, 80))
+        pygame.draw.polygon(screen, (0, 175, 255), ((80, 320), (95, 340), (65, 340)))
+        pygame.draw.line(screen, (0, 0, 0), (530, 320), (530, 450))
+        pygame.draw.ellipse(screen, (0, 175, 255), (500, 250, 60, 80))
+        pygame.draw.polygon(screen, (0, 175, 255), ((530, 320), (545, 340), (515, 340)))
+        # Congratulations text
+        screen.blit(win_text, (140, 180))
 
     # Must be the last two lines
     # of the game loop
