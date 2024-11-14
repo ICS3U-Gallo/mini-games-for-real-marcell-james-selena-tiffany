@@ -40,17 +40,17 @@ roll_x = -100
 # System and text variables 
 welcome_screen = True 
 win = False
-text_font = pygame.font.SysFont("Nunito", 30, False, False)
+type_font = pygame.font.SysFont("Nunito", 30, False, False)
 win_message = "Congrats! You got across the stage!"
-win_text = text_font.render(win_message, True, (0, 0, 0))
+win_text = type_font.render(win_message, True, (0, 0, 0))
 welcome_message = "Uh oh, there are tires rolling and falling onto the stage!"
-welcome_text = text_font.render(welcome_message, True, (0, 0, 0))
+welcome_text = type_font.render(welcome_message, True, (0, 0, 0))
 instructions_message = "Get across the stage by dodging the tires."
-instructions_text = text_font.render(instructions_message, True, (0, 0, 0))
+instructions_text = type_font.render(instructions_message, True, (0, 0, 0))
 directions_message = "Use arrow keys to move left, move right, and jump."
-directions_text = text_font.render(directions_message, True, (0, 0, 0))
+directions_text = type_font.render(directions_message, True, (0, 0, 0))
 click_message = "Click to begin." 
-click_text = text_font.render(click_message, True, (0, 0, 0))
+click_text = type_font.render(click_message, True, (0, 0, 0))
 
 # ---------------------------
 
