@@ -12,46 +12,56 @@ GROUND_LEVEL = HEIGHT - 150
 
 screen = pygame.display.set_mode(SIZE)
 clock = pygame.time.Clock()
-fps = 1000
+fps = 120
 
-
+you_win = pygame.time.get_ticks()
 beckground = pygame.image.load("background.png")
 ground = pygame.image.load("ground.png")
 ground1 = pygame.transform.scale(ground, (700, 137))
 pipe_gap = 120
-pipe_frequency = 2000
+pipe_frequency = 2500
 latest_pipe = pygame.time.get_ticks() - pipe_frequency
 ground_scroll = 0
 scroll_speed = 5
 cannon_speed = 5
+score = 0
+pass_pipe = False
 
 
 # ---------------------------
 # Initialize global variables
 
 game_over = False
-if game_over == True:
-    sys.exit()
 
 class Clown(pygame.sprite.Sprite):
     def __init__(self, x, y):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.image.load("cloonie.png")
         self.rect = self.image.get_rect()
-        self.rect.center = [x, y]
-        self.gravity = 0.5
-        self.jump = -10
-        self.velocity = 0
+        self.rect.center = [x, y]   
+        self.vel = 0
+        self.clicked = False
     def update(self):
-        self.velocity += self.gravity
-        self.rect.y += self.velocity
-        if self.rect.bottom < 350:
-            self.rect.y = 350
-            self.velocity = 0
-    def jump(self):
-        self.velocity = self.jump
-        if event.key == pygame.K_SPACE:
-            cloonie.jump()
+        if game_over == False:
+        #gravity
+            self.vel += 0.5
+            if self.vel > 7:
+                self.vel = 7
+            if self.rect.bottom <= 350:
+                self.rect.y += int(self.vel)
+            print(self.vel)
+            #jump
+            if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
+                self.clicked = True
+                self.vel = -9
+            if pygame.mouse.get_pressed()[0] == 0:
+                self.clicked = False
+        else:
+            self.vel = 8
+            if self.rect.bottom <= 350:
+                self.rect.y += int(self.vel)
+            
+
 
 class Pipe(pygame.sprite.Sprite):
     def __init__(self, x, y, position):
@@ -65,7 +75,7 @@ class Pipe(pygame.sprite.Sprite):
             self.rect.topleft = [x, y]
     def update(self):
         self.rect.x -= cannon_speed
-        if self.rect.height < 0:
+        if self.rect.right < 0:
             self.kill()
 
 pipe_group = pygame.sprite.Group()
@@ -90,18 +100,17 @@ while running:
         elif event.type == pygame.MOUSEBUTTONDOWN:
             print(event)
 
-    if pygame.sprite.groupcollide(clown_group, pipe_group, False, False):
-        game_over = True
 
     time_now = pygame.time.get_ticks()
     if time_now - latest_pipe > pipe_frequency:
-        pipe_height = random.randint(-100, 75) 
+        pipe_height = random.randint(-90, 75) 
         btm_pipe = Pipe(WIDTH, int(HEIGHT / 2) + pipe_height, -1)
         top_pipe = Pipe(WIDTH, int(HEIGHT / 2) + pipe_height, 1)
         pipe_group.add(btm_pipe)
         pipe_group.add(top_pipe)
         latest_pipe = time_now
     
+
 
     # GAME STATE UPDATES
 
@@ -113,15 +122,28 @@ while running:
     screen.blit(beckground, (0, 0))
     #circus cannon
     pipe_group.draw(screen)
-    pipe_group.update()
+    if game_over == False:
+        pipe_group.update()
 
     #background and scroll
     screen.blit(ground1, (ground_scroll, 350))
-    ground_scroll -= scroll_speed
-    if abs(ground_scroll) > 60:
-        ground_scroll = 0
+    if game_over == False:
+        ground_scroll -= scroll_speed
+        if abs(ground_scroll) > 60:
+            ground_scroll = 0
     #clown
     clown_group.draw(screen)
+    clown_group.update()
+
+    if pygame.time.get_ticks() - you_win >= 60000:
+        print('sigma')
+
+    if pygame.sprite.groupcollide(clown_group, pipe_group, False, False):
+        game_over = True
+
+    
+    print(score)
+    
 
 
     
