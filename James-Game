@@ -211,7 +211,7 @@ while running:
                 reset_game()
                 game_over = False
     
-    if pygame.time.get_ticks() - you_win >= 10000:
+    if pygame.time.get_ticks() - you_win >= 60000:
         win = True
 
     if pygame.sprite.groupcollide(clown_group, pipe_group, False, False):
