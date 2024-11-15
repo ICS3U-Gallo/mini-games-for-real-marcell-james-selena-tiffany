@@ -377,6 +377,7 @@ while running:
         #draw the enemy
         for i in range(len(enemy_pos)):
             pygame.draw.rect(screen, (255, 0, 0), (enemy_pos[i][0], enemy_pos[i][1], 20, 20))
+            pygame.draw.rect(screen, (0, 0, 0), (enemy_pos[i][0] + 5, enemy_pos[i][1] + 5, 10, 10))
 
         #how pygame.draw.rect(screen, (0, 0, 0), end_rect)
         screen.blit(circus_resized, pygame.Rect(end_rect))
