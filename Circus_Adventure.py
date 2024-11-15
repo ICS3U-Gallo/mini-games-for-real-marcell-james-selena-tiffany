@@ -223,7 +223,6 @@ shield_orb = False
 shield = False 
 shield_orb_x = 1000
 shield_orb_y = 1000
-end_game = False
 shield_start_time = 0
 
 # Darts
