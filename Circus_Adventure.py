@@ -1,4 +1,5 @@
 import random
+import sys
 import pygame
 
 pygame.init()
@@ -236,7 +237,7 @@ def draw_text(text, font, text_col, x, y):
 text_font = pygame.font.SysFont("Nunito", 40)
 
 # Initialization (Start Screen)
-initalization = False
+initialization = False
 end = False
 # ---------------------------
 
@@ -281,6 +282,131 @@ click_message = "Click to begin."
 click_text = type_font.render(click_message, True, (0, 0, 0))
 clicknext_message = "Click to continue."
 clicknext_text = type_font.render(clicknext_message, True, (0, 0, 0))
+
+# JAMES' VARIABLES
+
+GROUND_LEVEL = HEIGHT - 150
+fps = 120
+
+#font
+j_font = pygame.font.Font(None, 20)
+
+#game variables
+game_over = False
+done = False
+ground_scroll = 0
+scroll_speed = 5
+cannon_speed = 5
+pipe_gap = 120
+pipe_frequency = 2500
+
+#images
+beckground = pygame.image.load("background.png")
+ground = pygame.image.load("ground.png")
+ground1 = pygame.transform.scale(ground, (700, 137))
+button = pygame.image.load("button.png")
+button_rect = button.get_rect()
+circus = pygame.image.load("circus.png")
+
+#text
+text_surface = font.render("Survive for 60 seconds to win!", True, (255, 0, 0))
+text_rect = text_surface.get_rect()
+text_rect.bottomleft = [20, 460]
+
+j_font = pygame.font.Font(None, 72)
+
+#list
+raindrops = []
+
+#reset button
+j_pos = pygame.mouse.get_pos()
+
+#defining variables & classes
+def reset_game():
+    pipe_group.empty()
+    cloonie.rect.x = 100
+    cloonie.rect.y = int(HEIGHT / 2)
+
+class Clown(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.image.load("cloonie.png")
+        self.rect = self.image.get_rect()
+        self.rect.center = [x, y]   
+        self.vel = 0
+        self.clicked = False
+    def update(self):
+        if game_over == False:
+        #gravity
+            self.vel += 0.5
+            if self.vel > 7:
+                self.vel = 7
+            if self.rect.bottom <= 350:
+                self.rect.y += int(self.vel)
+            #jump
+            if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
+                self.clicked = True
+                self.vel = -9
+            if pygame.mouse.get_pressed()[0] == 0:
+                self.clicked = False
+        else:
+            self.vel = 8
+            if self.rect.bottom < 350:
+                self.rect.y += int(self.vel)
+            if self.rect.bottom > 350:
+                self.rect.bottom = 349
+        #top border
+        if self.rect.top < -5:
+            self.rect.top = -5
+
+
+class Pipe(pygame.sprite.Sprite):
+    def __init__(self, x, y, position):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.image.load("cannono.png")
+        self.rect = self.image.get_rect()
+        if position == 1:
+            self.image = pygame.transform.flip(self.image, False, True)
+            self.rect.bottomleft = [x, y - int(pipe_gap)]
+        if position == -1:
+            self.rect.topleft = [x, y]
+    def update(self):
+        self.rect.x -= cannon_speed
+        if self.rect.right < 0:
+            self.kill()
+
+def create_raindrops(num_drops):
+    for _ in range(num_drops):
+        x = random.randint(0, WIDTH)
+        y = random.randint(-HEIGHT, 0)
+        raindrops.append([x, y])
+
+def display_win_screen():
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            
+        screen.fill((255, 255, 255))
+
+        win_text = j_font.render("You Win!", True, (0, 255, 0))
+        win_rect = win_text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+        screen.blit(win_text, win_rect)
+
+
+        # Update the display
+        pygame.display.flip()
+        clock.tick(30)
+
+create_raindrops(100)
+
+pipe_group = pygame.sprite.Group()
+clown_group = pygame.sprite.Group()
+
+cloonie = Clown(100, int(HEIGHT / 2))
+clown_group.add(cloonie)
 
 # Whoever's game it is 
 tiffany = True
@@ -405,8 +531,8 @@ while running:
         if won_level_2 == True and event.type == pygame.MOUSEBUTTONDOWN: # Game Switcher
             tiffany = False
             marcell = True
-            initalization = True
-            initalization_start_time = pygame.time.get_ticks() 
+            initialization = True
+            initialization_start_time = pygame.time.get_ticks() 
         #GAME STATE UPDATES - level
         # re-makes the level with a second platform setting
 
@@ -604,6 +730,7 @@ while running:
                 if won_level_2 == True:
                     pygame.draw.rect(screen, (0, 0, 0), (0, 0, WIDTH, HEIGHT))
                     text_blit("You've arrived at the circus!", (255, 255, 255), (180, 100, 50, 50))
+                    text_blit("Click to Continue", (255, 255, 255), (220, 130, 50, 50))
 
             
         #play start screen
@@ -612,7 +739,7 @@ while running:
             pygame.draw.rect(screen, (210, 50, 90), play_rect)
             text_blit("PLAY", (0, 0, 0), (play_rect[0]+55, play_rect[1]+25, play_rect[2], play_rect[3]))
             text_blit("CIRCUS ADVENTURE", (255, 255, 255), (play_rect[0]-20, play_rect[1]-50, 100, 50))
-# -----------------------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------------------------
     # MARCELL'S GAME 
     if marcell == True: 
         # EVENT HANDLING
@@ -635,12 +762,12 @@ while running:
         # GAME STATE UPDATES ------------------------------------------
         
         # Start Screen
-        if initalization == True:
+        if initialization == True:
             draw_text("Pop 50 Balloons to Win!", text_font, (255,255,255), 150,190)
             draw_text("Mouse to Move, SPACE to Shoot!", text_font, (255,255,255), 90,220)
             draw_text("Careful of the Bomb!", text_font, (255,255,255), 170,250)
-            if pygame.time.get_ticks() - initalization_start_time > 5000:
-                initalization = False
+            if pygame.time.get_ticks() - initialization_start_time > 5000:
+                initialization = False
         
         # Win Condition
         if score >= 50:
@@ -655,7 +782,7 @@ while running:
             draw_text("Click to Continue", text_font, (255,255,255), 190,230)
         
         # Gameplay
-        if initalization == False and score < 50:
+        if initialization == False and score < 50:
             
             # Darts  
             for pos in darts:
@@ -953,7 +1080,7 @@ while running:
                 
             # Score Counter
             draw_text(f"Score: {score}", text_font, (0,0,0), 5,400)
-# ----------------------------------------------------------------
+# ------------------------------------------------------------------------------------------------------
     # SELENA'S GAME
     if selena == True:
         # EVENT HANDLING
@@ -976,6 +1103,9 @@ while running:
                     welcome_screen = False
                 elif win == True: 
                     selena = False 
+                    
+                    you_win = pygame.time.get_ticks()
+                    latest_pipe = pygame.time.get_ticks() - pipe_frequency
                     james = True 
 
         # GAME STATE UPDATES
@@ -1110,10 +1240,82 @@ while running:
             # Congratulations text
             screen.blit(win_text, (140, 180))
             screen.blit(clicknext_text, (230, 230))
-
+# ------------------------------------------------------------------------------------------------------
     # JAMES' GAME 
     if james == True: 
-        screen.fill((255, 0, 0))
+        clock.tick(fps)
+        # EVENT HANDLING
+    
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+        
+        if done == True:
+            display_win_screen()
+
+
+        #pipes
+        time_now = pygame.time.get_ticks()
+        if time_now - latest_pipe > pipe_frequency:
+            pipe_height = random.randint(-90, 75) 
+            btm_pipe = Pipe(WIDTH, int(HEIGHT / 2) + pipe_height, -1)
+            top_pipe = Pipe(WIDTH, int(HEIGHT / 2) + pipe_height, 1)
+            pipe_group.add(btm_pipe)
+            pipe_group.add(top_pipe)
+            latest_pipe = time_now
+
+        # DRAWING
+        screen.fill((255, 255, 255))  # always the first drawing command
+        #background
+        screen.blit(beckground, (0, 0))
+        #raindrops
+        if game_over == False:
+            for drop in raindrops:
+                drop[1] += 5
+                pygame.draw.line(screen, (82, 178, 191), (drop[0], drop[1]), (drop[0], drop[1] + 10), 2)
+
+                if drop[1] > HEIGHT:
+                    drop[1] = random.randint(-20, 0)
+                    drop[0] = random.randint(0, WIDTH)
+        #circus
+        screen.blit(circus, (0, 270))
+        #fences!
+        pygame.draw.rect(screen, (213, 186, 152), (0, 300, WIDTH, 10))
+        pygame.draw.rect(screen, (213, 186, 152), (0, 325, WIDTH, 10))
+        for i in range(0, WIDTH, 35):
+            pygame.draw.rect(screen, (213, 186, 152), (i, 290, 10, 60))
+            pygame.draw.circle(screen, (213, 186, 152), (i + 5, 290), 5)
+        
+        #circus cannon
+        pipe_group.draw(screen)
+        if game_over == False:
+            pipe_group.update()
+        #background and scroll
+        screen.blit(ground1, (ground_scroll, 350))
+        if game_over == False:
+            ground_scroll -= scroll_speed
+            if abs(ground_scroll) > 60:
+                ground_scroll = 0
+        #text
+        screen.blit(text_surface, text_rect)
+        #clown
+        clown_group.draw(screen)
+        clown_group.update()
+        #button
+        if game_over == True:
+            you_win = 0
+            screen.blit(button, (WIDTH // 2 - 50, HEIGHT // 2 - 75))
+            if button_rect.collidepoint(j_pos):
+                if pygame.mouse.get_pressed()[0] == 1:
+                    reset_game()
+                    you_win = pygame.time.get_ticks()
+                    game_over = False
+        
+        if pygame.time.get_ticks() - you_win >= 60000:
+            done = True
+
+        if pygame.sprite.groupcollide(clown_group, pipe_group, False, False):
+            game_over = True
     
 
     # Must be the last two lines
