@@ -56,11 +56,10 @@ shield_orb = False
 shield = False 
 shield_orb_x = 1000
 shield_orb_y = 1000
-end_game = False
 shield_start_time = 0
 
 # Darts
-darts = []
+darts = [] # Lists!!
 
 # Score
 score = 0
@@ -70,8 +69,8 @@ def draw_text(text, font, text_col, x, y):
 text_font = pygame.font.SysFont("Nunito", 40)
 
 # Initialization (Start Screen)
-initalization = True
-initalization_start_time = pygame.time.get_ticks()
+initialization = True
+initialization_start_time = pygame.time.get_ticks()
 end = False
 # ---------------------------
 running = True
@@ -90,12 +89,12 @@ while running:
     # GAME STATE UPDATES ------------------------------------------
     
     # Start Screen
-    if initalization == True:
+    if initialization == True:
         draw_text("Pop 50 Balloons to Win!", text_font, (255,255,255), 150,190)
         draw_text("Mouse to Move, SPACE to Shoot!", text_font, (255,255,255), 90,220)
         draw_text("Careful of the Bomb!", text_font, (255,255,255), 170,250)
-        if pygame.time.get_ticks() - initalization_start_time > 5000:
-            initalization = False
+        if pygame.time.get_ticks() - initialization_start_time > 5000:
+            initialization = False
     
     # Win Condition
     if score >= 50:
@@ -109,7 +108,7 @@ while running:
         draw_text("Congratulations! You Won!!", text_font, (255,255,255), 130,220)
     
     # Gameplay
-    if initalization == False and score < 50:
+    if initialization == False and score < 50:
         
         # Darts  
         for pos in darts:
@@ -348,7 +347,7 @@ while running:
         
         # Darts
         for i in darts:
-            pygame.draw.ellipse(screen, (0,0,0), (i[0],i[1],5,10))
+            pygame.draw.ellipse(screen, (0,0,0), (i[0],i[1],5,10)) # Drawing with for loops!!
         
         # Bomb
         pygame.draw.circle(screen, (0,0,0), (bomb_x,bomb_y), 50)
