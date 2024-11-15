@@ -279,6 +279,8 @@ directions_message = "Use arrow keys to move left, move right, and jump."
 directions_text = type_font.render(directions_message, True, (0, 0, 0))
 click_message = "Click to begin." 
 click_text = type_font.render(click_message, True, (0, 0, 0))
+clicknext_message = "Click to continue."
+clicknext_text = type_font.render(clicknext_message, True, (0, 0, 0))
 
 # Whoever's game it is 
 tiffany = True
@@ -291,7 +293,7 @@ running = True
 while running:
 
     if tiffany == True:
-# TIFFANY'S GAME
+    # TIFFANY'S GAME
         current_time = pygame.time.get_ticks()
         clown_rect = pygame.Rect(clown_x-clown_radius, clown_y-clown_radius, clown_radius*2, clown_radius*2)
         lifted = False
@@ -951,7 +953,7 @@ while running:
                 
             # Score Counter
             draw_text(f"Score: {score}", text_font, (0,0,0), 5,400)
-    # ----------------------------------------------------------------
+# ----------------------------------------------------------------
     # SELENA'S GAME
     if selena == True:
         # EVENT HANDLING
@@ -1107,6 +1109,7 @@ while running:
             pygame.draw.polygon(screen, (0, 175, 255), ((530, 320), (545, 340), (515, 340)))
             # Congratulations text
             screen.blit(win_text, (140, 180))
+            screen.blit(clicknext_text, (230, 230))
 
     # JAMES' GAME 
     if james == True: 
