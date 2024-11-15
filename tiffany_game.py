@@ -16,9 +16,9 @@ clock = pygame.time.Clock()
 font = pygame.font.SysFont("Arial", 25)
 
 #clown presets
-clown_x = 50
-clown_y = 50
-clown_radius = 15 # clown radius needs to be 16 or less as tile_size is 32
+clown_x = 250
+clown_y = 250
+clown_radius = 10 # clown radius needs to be 16 or less as tile_size is 32
 clown_y_change = 0
 clown_x_change = 0
 x_pos_tile = 0
@@ -67,7 +67,7 @@ won_level_1 = False #level 1 done or not
 maxed = False #will be true when rectangle animation is off the screen
 start_2 = False #starts level 2
 won_level_2 = False
-win_text = font.render("You arrived at the circus!", True, (255, 255, 255))
+
 
 #loads circus image
 circus_tent = pygame.image.load("circus_tent.png").convert_alpha()
@@ -79,9 +79,7 @@ circus_resized = pygame.transform.scale(circus_tent, (end_rect[2], end_rect[3]))
 help_rect = [600, 10, 30, 30]
 help_question = font.render("?", True, (0, 0, 0)) #adds the question mark to the help window when closed
 help_open = False #checks if the help window is open or not
-help_window = font.render("W: jump (hold); A: move left; S: shrink; D: move right", True, (0, 0, 0))
-help_goal = font.render("Goal: help the clown reach the circus tent!", True, (0, 0, 0))
-exit_window = font.render("Press ESC to exit this window", True, (0, 0, 0))
+
 
 #enemy
 enemy_pos = [[random.randint(0+tile_size, WIDTH-tile_size*2), 100, 20, 20] for i in range(4)]
@@ -95,15 +93,19 @@ reset_enemy_pos = 0
 
 # dying variable (will show end screen)
 dead = False
-dead_text = font.render("You have died to your business rival: clown brother #1", True, (0, 0, 0))
+
 dead_is_True = 50
 
 #start playing
 play_rect = [230, 180, 160, 80]
-play_text = font.render("PLAY", True, (0, 0, 0))
-game_name = font.render("CIRCUS ADVENTURE", True, (255, 255, 255))
+
 
 running = True
+
+
+def text_blit(text, colour, position):
+    text_para = font.render(text, True, colour)
+    screen.blit(text_para, position)
 
 while running:
     current_time = pygame.time.get_ticks()
@@ -120,11 +122,12 @@ while running:
         elif event.type == pygame.KEYDOWN:
             if help_open == False and dead == False and level != 0: #cannot win by pressing randomly while help window is open
             # able to press multiple keys and move in two directions at once
+                print(on_tile)
                 if on_tile == True:
-                    if event.key == pygame.K_w and all_tiles[y_pos_tile-1][x_pos_tile] != 1: #so clown can't phase upwards
+                    if event.key == pygame.K_w: #so clown can't phase upwards
                         moving[0] = 1
                         jumping = True
-
+        
                 if event.key == pygame.K_a: # move left
                     moving[1] = 1
                 if event.key == pygame.K_s: # shrink size of clown
@@ -149,9 +152,9 @@ while running:
             if event.key == pygame.K_s: #a toggle
                 
                 if shrunk == False:
-                    clown_radius = 15
-                elif shrunk == True:
                     clown_radius = 10
+                elif shrunk == True:
+                    clown_radius = 5
                     
             if event.key == pygame.K_d:
                 moving[3] = 0
@@ -166,29 +169,63 @@ while running:
     # checks if key is still pressed and moves accordingly (S is only shrink once)
 
     if moving[1] == 1: # moving left and not colliding
-        if all_tiles[y_pos_tile][x_pos_tile-1] == 0:
-            clown_x_change = -3
+        new_clown_x = clown_x - 3
+        for i in platforms:  
+            new_rect = pygame.Rect(new_clown_x-clown_radius, clown_y-clown_radius, clown_radius*2, clown_radius*2) #checks in advance whether it hits or not
+
+            if new_rect.colliderect(i):
+                new_clown_x = clown_x
+                break
+        clown_x = new_clown_x
 
     if moving[3] == 1: # moving right and not colliding
-        if all_tiles[y_pos_tile][x_pos_tile+1] == 0:
-            clown_x_change = 3
-    
-    if level != 0:
-        if moving[0] == 1: # moving up and not colliding
-            platform_above = 0
-            for i in platforms:
-                if clown_rect.colliderect(i) and on_tile == False:
-                    moving[0] = 0
-                    clown_y_change = 4
-                    platform_above = 1
-            if platform_above == 0:
-                clown_y_change = -4
+        new_clown_x = clown_x + 3
+        for i in platforms:  
+            new_rect = pygame.Rect(new_clown_x-clown_radius, clown_y-clown_radius, clown_radius*2, clown_radius*2) #checks in advance whether it hits or not
+
+            if new_rect.colliderect(i):
+                new_clown_x = clown_x
+                break
         
+        clown_x = new_clown_x
+    
+    if moving[0] == 1: # moving up and not colliding
+        platform_above = 0
+        for i in platforms:
+            new_rect = pygame.Rect(clown_x-clown_radius, clown_y-clown_radius, clown_radius*2, clown_radius*2-5)
+            if new_rect.colliderect(i):
+                moving[0] = 0
+                platform_above = 1
+        if platform_above == 0:
+            clown_y_change = -3
+        
+        elif platform_above == 1:
+            clown_y_change = 3
+        
+        clown_y += clown_y_change
+
+
+    if level != 0:
+        on_tile = False
+
         if on_tile == False and moving[0] == 0:
             clown_y_change += gravity
+            clown_y += clown_y_change
+
+        for i in platforms:
+            new_rect = pygame.Rect(clown_x-clown_radius, clown_y-clown_radius, clown_radius*2, clown_radius*2+gravity)
+            if clown_y_change >= -1 and new_rect.colliderect(i):
+                on_tile = True
+                clown_y_change = 0
+                clown_y = i.top - clown_radius
+                break
+            else:
+                on_tile = False
+            
     
-    if moving[1] == 0 and moving[3] == 0:
-        clown_x_change = 0
+        if moving[1] == 0 and moving[3] == 0:
+            clown_x_change = 0
+    
 
     
     #GAME STATE UPDATES - level
@@ -215,11 +252,6 @@ while running:
     if level != 0:
         clown_y += clown_y_change
         clown_x += clown_x_change
-
-        for i in platforms:
-            if jumping == True and clown_rect.colliderect(i) and clown_y+clown_radius+5 < i[1] + i[3]:
-                on_tile = True
-        print(jumping)
         
         if on_tile == True:
             clown_y_change = -0.5
@@ -249,34 +281,12 @@ while running:
                                 platforms.append(rect)
                 win_time = current_time
 
-
-        #gravity settings --- need to check which multiple of 32 (tile_size) the clown is between
-        for i in range(WIDTH//tile_size): # current x number tile clown is on
-            if clown_x-clown_radius >= tile_size*i and clown_x+clown_radius <= tile_size*(i+1): #fully on a block
-                x_pos_tile = i
-            
-        for i in range(HEIGHT//tile_size): # current y number tile clown is on
-            if clown_y > tile_size*i and clown_y < tile_size*(i+1):
-                y_pos_tile = i
-
-        if all_tiles[y_pos_tile+1][x_pos_tile] == 0:
-            on_tile = False
-
-        
-        #checks if tile below clown is a platform and clown's position is just above it    
-        if shrunk == False:
-            if all_tiles[y_pos_tile+1][x_pos_tile] == 1 and y_pos_tile*tile_size <= clown_y-clown_radius + 3: 
-                clown_y_change = 0
-                on_tile = True
-        elif shrunk == True:
-            if all_tiles[y_pos_tile+1][x_pos_tile] == 1 and y_pos_tile*tile_size <= clown_y-clown_radius - 3: 
-                clown_y_change = 0
-                on_tile = True
             
         if clown_rect.colliderect(end_rect) and level == 2:
             won_level_2 = True
-        
-        #GAME STATE UPDATES --- enemy:
+
+            
+    #GAME STATE UPDATES --- enemy:
         for i in range(len(enemy_action)): # enemy random movements
             if level == 1 or (level == 2 and current_time - win_time >= 500):
                 enemy_rect = pygame.Rect(enemy_pos[i]) #creates enemy hitbox
@@ -328,7 +338,6 @@ while running:
                 
             if clown_rect.colliderect(enemy_rect):
                 dead = True #needed so that the rectangle doesn't disappear
-    
 
         #DRAWING
     if level != 0:
@@ -337,9 +346,9 @@ while running:
 
         #draw the clown
         pygame.draw.circle(screen, (255, 255, 255), (clown_x, clown_y), clown_radius) #head
-        pygame.draw.circle(screen, (0, 0, 0), (clown_x-10, clown_y), clown_radius - 10) #left eye
-        pygame.draw.circle(screen, (0, 0, 0), (clown_x+10, clown_y), clown_radius - 10) #right eye
-        pygame.draw.circle(screen, (255, 100, 100), (clown_x, clown_y+10), clown_radius - 10) #nose
+        pygame.draw.circle(screen, (0, 0, 0), (clown_x-8, clown_y), clown_radius - 5) #left eye
+        pygame.draw.circle(screen, (0, 0, 0), (clown_x+8, clown_y), clown_radius - 5) #right eye
+        pygame.draw.circle(screen, (255, 100, 100), (clown_x, clown_y+8), clown_radius - 4) #nose
 
         for i in range(len(all_tiles)): #y_pos
             for a in range(len(all_tiles[i])): #x_pos
@@ -359,9 +368,9 @@ while running:
 
         if help_open == True: # checks if help box is open to show text
             screen.fill((255, 255, 255))
-            screen.blit(help_window, (90, 50, 540, 100))
-            screen.blit(help_goal, (115, 100, 300, 100))
-            screen.blit(exit_window, (180, 400, 300, 100))
+            text_blit("W: jump (hold); A: move left; S: shrink; D: move right", (0, 0, 0), (90, 50, 540, 100))
+            text_blit("Goal: help the clown reach the circus tent!", (0, 0, 0), (115, 100, 300, 100))
+            text_blit("Press ESC to exit this window", (0, 0, 0), (180, 400, 300, 100))
             
 
         if won_level_1 == True and current_time - win_time < 500 and level == 2:
@@ -374,7 +383,7 @@ while running:
         
         if won_level_2 == True:
             pygame.draw.rect(screen, (0, 0, 0), (0, 0, WIDTH, HEIGHT))
-            screen.blit(win_text, (150, 100, 50, 50))
+            text_blit("You've arrived at the circus!", (255, 255, 255), (150, 100, 50, 50))
 
 
 
@@ -385,15 +394,15 @@ while running:
             pygame.draw.rect(screen, (255, 0, 0), (WIDTH//2-dead_is_True, HEIGHT//2-dead_is_True+50, dead_is_True*2, dead_is_True*2-80))
 
             if dead_is_True > WIDTH//2:
-                screen.blit(dead_text, (60, 200, 300, 100))
+                text_blit("You have died to your business rival: clown brother #1", (0, 0, 0), (60, 200, 300, 100))
         
         
     #play start screen
     if level == 0:
         screen.fill((0, 0, 0))
         pygame.draw.rect(screen, (210, 50, 90), play_rect)
-        screen.blit(play_text, (play_rect[0]+55, play_rect[1]+25, play_rect[2], play_rect[3])) #"play" text
-        screen.blit(game_name, (play_rect[0]-20, play_rect[1]-50, 100, 50))
+        text_blit("PLAY", (0, 0, 0), (play_rect[0]+55, play_rect[1]+25, play_rect[2], play_rect[3]))
+        text_blit("CIRCUS ADVENTURE", (255, 255, 255), (play_rect[0]-20, play_rect[1]-50, 100, 50))
 
     pygame.display.flip()
     clock.tick(30)
