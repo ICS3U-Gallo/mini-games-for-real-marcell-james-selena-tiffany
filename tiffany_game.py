@@ -336,8 +336,7 @@ while running:
                         enemy_pos[i][1] = a.top - enemy_pos[i][3]
 
                         break
-
-                print(on_tile_enemy)
+                        
                 for a in platforms:
                     if on_tile_enemy[i] == False and new_rect.colliderect(a) and a[1] < new_rect[1]: #checks if collides with the bottom of a platform
                         enemy_y_change[i] += 1.5
