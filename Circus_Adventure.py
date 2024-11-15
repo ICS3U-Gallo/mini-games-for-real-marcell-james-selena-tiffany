@@ -113,6 +113,69 @@ def text_blit(text, colour, position):
     text_para = font.render(text, True, colour)
     screen.blit(text_para, position)
 
+def restart():
+    global clown_x, clown_y, clown_radius, clown_y_change, clown_x_change, moving, shrunk, w_started_time, holding_w_time, lifted, level, on_tile, platforms, enemy_pos, enemy_action, enemy_on_tile, x_pos_tile_enemy, y_pos_tile_enemy, enemy_y_change, teleport, enemy_time, on_tile_enemy, end_rect, win_time, win_size, won_level_1, maxed, start_2, won_level_2, dead, dead_time, dead_is_True, all_tiles
+    clown_x = 50
+    clown_y = 50
+    clown_radius = 10 # clown radius needs to be 16 or less as tile_size is 32
+    clown_y_change = 0
+    clown_x_change = 0
+    moving = [0, 0, 0, 0]
+    shrunk = False
+    w_started_time = 0
+    holding_w_time = 0
+    lifted = False
+    level = 1
+    on_tile = False
+
+    all_tiles = [
+            [1 for i in range(20)],
+            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+            [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+            [1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+            [1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1],
+            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+            [1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1],
+            [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1],
+            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+            [1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1],
+            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1],
+            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1],
+            [1 for i in range(20)],
+            [1 for i in range(20)]
+            ]
+    
+    platforms = []
+    for i in range(len(all_tiles)): # creates the list of platforms and their locations (not in terms of tile numbers)
+        for a in range(len(all_tiles[i])):
+            if all_tiles[i][a] == 1:
+                rect = pygame.Rect(a*tile_size, i*tile_size, tile_size, tile_size)
+                platforms.append(rect)
+    
+
+    enemy_pos = [[random.randint(100, WIDTH-tile_size*2), 50, 20, 20] for i in range(4)]
+    enemy_action = [0 for i in range(len(enemy_pos))]
+    enemy_on_tile = [False for i in range(len(enemy_pos))]
+    x_pos_tile_enemy = [0 for i in range(len(enemy_pos))]
+    y_pos_tile_enemy = [0 for i in range(len(enemy_pos))]
+    enemy_y_change = [0 for i in range(len(enemy_pos))]
+    teleport = [0 for i in range(len(enemy_pos))]
+    enemy_time = [0 for i in range(len(enemy_pos))]
+    on_tile_enemy = [False for i in range(len(enemy_pos))]
+
+    end_rect = [50, 340, 70, 70] # the win condition
+    win_time = 0 #time from win
+    win_size = 50 #size of rectangle animation after win
+    won_level_1 = False #level 1 done or not
+    maxed = False #will be true when rectangle animation is off the screen
+    start_2 = False #starts level 2
+    won_level_2 = False
+    
+    dead = False
+    dead_time = 0
+    dead_is_True = 50
+
 # MARCELL'S VARIABLES 
 
 # Player
@@ -263,6 +326,10 @@ while running:
                 
                 if event.key == pygame.K_ESCAPE:
                     help_open = False
+                
+                if dead == True:
+                    if event.key == pygame.K_r: #reset all variables again
+                        restart()
 
 
             # let go of key
@@ -340,6 +407,7 @@ while running:
             initalization_start_time = pygame.time.get_ticks() 
         #GAME STATE UPDATES - level
         # re-makes the level with a second platform setting
+
         if level == 2:
             all_tiles = [
             [1 for i in range(20)],
@@ -524,6 +592,7 @@ while running:
 
                 if dead_is_True > WIDTH//2:
                     text_blit("You have died to your business rival: clown brother #1", (0, 0, 0), (60, 200, 300, 100))
+                    text_blit("Press R to restart", (0, 0, 0), (150, 300, 100, 100))
             
             
             elif dead == False:# draws a rectangle with increasing side lengths to transition to the next level
