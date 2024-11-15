@@ -151,7 +151,7 @@ while running:
         # Start Screen
         if initalization == True:
             draw_text("Pop 50 Balloons to Win!", text_font, (255,255,255), 150,190)
-            draw_text("Mouse to Move, SPACE to Shoot!", text_font, (255,255,255), 110,220)
+            draw_text("Mouse to Move, SPACE to Shoot!", text_font, (255,255,255), 90,220)
             draw_text("Careful of the Bomb!", text_font, (255,255,255), 170,250)
             if pygame.time.get_ticks() - initalization_start_time > 5000:
                 initalization = False
