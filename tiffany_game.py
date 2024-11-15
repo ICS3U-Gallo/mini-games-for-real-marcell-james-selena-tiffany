@@ -19,8 +19,6 @@ clown_y = 50
 clown_radius = 10 # clown radius needs to be 16 or less as tile_size is 32
 clown_y_change = 0
 clown_x_change = 0
-x_pos_tile = 0
-y_pos_tile = 0
 gravity = 0.3 #will be acceleration, not constant
 
 #moving [W, A, S, D]
