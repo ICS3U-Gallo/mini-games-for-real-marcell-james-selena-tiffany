@@ -223,6 +223,7 @@ shield_orb = False
 shield = False 
 shield_orb_x = 1000
 shield_orb_y = 1000
+end_game = False
 shield_start_time = 0
 
 # Darts
@@ -1302,6 +1303,7 @@ while running:
         clown_group.update()
         #button
         if game_over == True:
+            you_win = 1000000000
             screen.blit(button, (WIDTH // 2 - 50, HEIGHT // 2 - 75))
             if button_rect.collidepoint(j_pos):
                 if pygame.mouse.get_pressed()[0] == 1:
