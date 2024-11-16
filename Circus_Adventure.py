@@ -1302,7 +1302,6 @@ while running:
         clown_group.update()
         #button
         if game_over == True:
-            you_win = 0
             screen.blit(button, (WIDTH // 2 - 50, HEIGHT // 2 - 75))
             if button_rect.collidepoint(j_pos):
                 if pygame.mouse.get_pressed()[0] == 1:
