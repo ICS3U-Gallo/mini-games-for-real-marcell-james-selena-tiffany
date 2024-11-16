@@ -1,0 +1,414 @@
+import random
+import pygame
+
+pygame.init()
+
+WIDTH = 640
+HEIGHT = 480
+SIZE = (WIDTH, HEIGHT)
+
+screen = pygame.display.set_mode(SIZE)
+clock = pygame.time.Clock()
+# ---------------------------
+# Initialize global variables
+
+# Player
+player_x = 320
+player_y = 420
+
+# Balloons
+balloon_x = 100
+balloon_y = 100
+balloon_x_speed = 10
+balloon_y_speed = 10
+
+balloon_2_x = 500
+balloon_2_y = 200
+balloon_2_x_speed = 10
+balloon_2_y_speed = 10
+
+balloon_3_x = 400
+balloon_3_y = 150
+balloon_3_x_speed = 10
+balloon_3_y_speed = 10
+
+balloon_4_x = 600
+balloon_4_y = 50
+balloon_4_x_speed = 10
+balloon_4_y_speed = 10
+
+balloon_5_x = 350
+balloon_5_y = 100
+balloon_5_x_speed = 10
+balloon_5_y_speed = 10
+
+# The Bomb
+bomb_x = WIDTH//2
+bomb_y = HEIGHT//2
+bomb_x_speed = 5
+bomb_y_speed = 5
+explosion_radius = 10
+explosion = False
+explosion_count = 0
+
+# Shield Powerup
+shield_orb = False
+shield = False 
+shield_orb_x = 1000
+shield_orb_y = 1000
+shield_start_time = 0
+
+# Darts
+darts = [] # Lists!!
+
+# Score
+score = 0
+def draw_text(text, font, text_col, x, y):
+    img = font.render(text, True, text_col)
+    screen.blit(img, (x,y))
+text_font = pygame.font.SysFont("Nunito", 40)
+
+# Initialization (Start Screen)
+initialization = True
+initialization_start_time = pygame.time.get_ticks()
+end = False
+# ---------------------------
+running = True
+while running:
+    # EVENT HANDLING ----------------------------------------------
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+        
+        # Shooting Function
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE:
+                dart = [player_x,player_y-25]
+                darts.append(dart)
+
+    # GAME STATE UPDATES ------------------------------------------
+    
+    # Start Screen
+    if initialization == True:
+        draw_text("Pop 50 Balloons to Win!", text_font, (255,255,255), 150,190)
+        draw_text("Mouse to Move, SPACE to Shoot!", text_font, (255,255,255), 90,220)
+        draw_text("Careful of the Bomb!", text_font, (255,255,255), 170,250)
+        if pygame.time.get_ticks() - initialization_start_time > 5000:
+            initialization = False
+    
+    # Win Condition
+    if score >= 50:
+        end = True
+    
+    # Win Screen
+    if end == True:
+        bomb_x = -1000
+        bomb_x_speed = 0
+        pygame.draw.rect(screen, (0, 0, 0), (0,0,WIDTH,HEIGHT))
+        draw_text("Congratulations! You Won!!", text_font, (255,255,255), 130,220)
+    
+    # Gameplay
+    if initialization == False and score < 50:
+        
+        # Darts  
+        for pos in darts:
+            pos[1] -= 30 # Dart Speed
+            
+            # Balloon + Dart 1
+            if pos[1] <= balloon_y+30 and pos[1] >= balloon_y-30 and pos[0] >= balloon_x-30 and pos[0] <= balloon_x+30: # Manual Dart + Balloon Collision Detection
+                score += 1
+                shield_orb_random = random.randrange(0,15)     # RNG for powerup orb to spawn
+                if shield_orb_random == 0 and shield_orb_y > HEIGHT:     # Checking for random number and if powerup orb already exists on the screen
+                    shield_orb_x = random.randrange(1,WIDTH-20)     # Spawning powerup orb
+                    shield_orb_y = -20
+                    shield_orb = True     # Allowing the powerup orb to move downwards
+                pos[0] = 1000             # Teleporting dart off screen to avoid repeat collisions
+                pos[1] = 1000
+                balloon_x = random.randrange(50,600,10)     # Respawning balloon at a random location
+                balloon_y = random.randrange(50,230,10)
+            
+            # Balloon + Dart 2
+            if pos[1] <= balloon_2_y+30 and pos[1] >= balloon_2_y-30 and pos[0] >= balloon_2_x-30 and pos[0] <= balloon_2_x+30:
+                score += 1
+                shield_orb_random = random.randrange(0,15)
+                if shield_orb_random == 0 and shield_orb_y > HEIGHT:
+                    shield_orb_x = random.randrange(1,WIDTH-20)
+                    shield_orb_y = -20
+                    shield_orb = True
+                pos[0] = 1000
+                pos[1] = 1000
+                balloon_2_x = random.randrange(50,600,10)
+                balloon_2_y = random.randrange(50,230,10)
+
+            # Balloon + Dart 3
+            if pos[1] <= balloon_3_y+30 and pos[1] >= balloon_3_y-30 and pos[0] >= balloon_3_x-30 and pos[0] <= balloon_3_x+30:
+                score += 1
+                shield_orb_random = random.randrange(0,15)
+                if shield_orb_random == 0 and shield_orb_y > HEIGHT:
+                    shield_orb_x = random.randrange(1,WIDTH-20)
+                    shield_orb_y = -20
+                    shield_orb = True
+                pos[0] = 1000
+                pos[1] = 1000
+                balloon_3_x = random.randrange(50,600,10)
+                balloon_3_y = random.randrange(50,230,10)
+            
+            # Balloon + Dart 4
+            if pos[1] <= balloon_4_y+30 and pos[1] >= balloon_4_y-30 and pos[0] >= balloon_4_x-30 and pos[0] <= balloon_4_x+30:
+                score += 1
+                shield_orb_random = random.randrange(0,15)
+                if shield_orb_random == 0 and shield_orb_y > HEIGHT:
+                    shield_orb_x = random.randrange(1,WIDTH-20)
+                    shield_orb_y = -20
+                    shield_orb = True
+                pos[0] = 1000
+                pos[1] = 1000
+                balloon_4_x = random.randrange(50,600,10)
+                balloon_4_y = random.randrange(50,230,10)
+            
+            # Balloon + Dart 5
+            if pos[1] <= balloon_5_y+30 and pos[1] >= balloon_5_y-30 and pos[0] >= balloon_5_x-30 and pos[0] <= balloon_5_x+30:
+                score += 1
+                shield_orb_random = random.randrange(0,15)
+                if shield_orb_random == 0 and shield_orb_y > HEIGHT:
+                    shield_orb_x = random.randrange(1,WIDTH-20)
+                    shield_orb_y = -20
+                    shield_orb = True
+                pos[0] = 1000
+                pos[1] = 1000
+                balloon_5_x = random.randrange(50,600,10)
+                balloon_5_y = random.randrange(50,230,10)
+            
+            # Dart + Bomb Collision
+            if pos[1] <= bomb_y+50 and pos[1] >= bomb_y-50 and pos[0] >= bomb_x-50 and pos[0] <= bomb_x+50:
+                pos[0] = 1000
+                pos[1] = 1000
+                explosion = True
+        
+        # Bomb Movement and Hitbox
+        bomb_x += bomb_x_speed
+        if bomb_x >= WIDTH-50 or bomb_x <= 50:
+            bomb_x_speed *= -1
+        bomb_y += bomb_y_speed
+        if bomb_y >= HEIGHT-50 or bomb_y <= 50:
+            bomb_y_speed *= -1
+        bomb_hitbox = pygame.Rect(bomb_x-40,bomb_y-40,80,80)
+        
+        # Mouse Control
+        mouse_x, mouse_y = pygame.mouse.get_pos()
+        player_x = mouse_x
+
+        # Shield 
+            # Shield Orb Hitbox
+        shield_orb_hitbox = pygame.Rect(shield_orb_x,shield_orb_y,20,20)
+        
+            # Shield Effect (Removing Player Hitbox)
+        if shield == True:
+            player_hitbox = pygame.Rect(1000,player_y-30,60,60)
+        if shield == False:
+            player_hitbox = pygame.Rect(player_x-30,player_y-30,60,60)
+        
+            # Shield Orb Movement
+        if shield_orb == True:
+            shield_orb_y += 5
+        
+            # Shield Orb Collision Detection
+        if shield_orb_hitbox.colliderect(player_hitbox):
+            shield_orb_x = 1000
+            shield = True
+            shield_start_time = pygame.time.get_ticks()
+        
+            # Shield Timer
+        if pygame.time.get_ticks() - shield_start_time > 5000:
+            shield = False
+
+        # Clown + Bomb Collision Detection
+        if player_hitbox.colliderect(bomb_hitbox):
+            player_x = 1000
+            player_y = 1000
+            explosion = True
+        
+        # Explosion
+        if explosion == True:
+            explosion_radius += 100
+            explosion_count += 1
+            if explosion_count == 8:
+                explosion_radius = 0
+                player_x = mouse_x
+                player_y = 420
+                score = 0
+                explosion_count = 0
+                shield = True
+                explosion = False
+        
+        # Balloon Movement 
+            # Balloon 1
+        if balloon_x+30 == WIDTH or balloon_x-30 == 0:
+            balloon_x_speed *= -1
+        balloon_x += balloon_x_speed
+        balloon_x_switcher = random.randrange(0,50) # 1/50 Chance every frame to change x direction
+        if balloon_x_switcher == 0:
+            balloon_x_speed *=-1
+            balloon_x += balloon_x_speed
+        if balloon_y+30 == 300 or balloon_y-30 == 0:
+            balloon_y_speed *= -1
+        balloon_y += balloon_y_speed
+        balloon_y_switcher = random.randrange(0,50) # 1/50 Chance every frame to change y direction
+        if balloon_y_switcher == 0:
+            balloon_y_speed *=-1
+            balloon_y += balloon_y_speed
+            
+            # Balloon 2
+        if balloon_2_x+30 == WIDTH or balloon_2_x-30 == 0:
+            balloon_2_x_speed *= -1
+        balloon_2_x += balloon_2_x_speed
+        balloon_2_x_switcher = random.randrange(0,50)
+        if balloon_2_x_switcher == 0:
+            balloon_2_x_speed *=-1
+            balloon_2_x += balloon_2_x_speed  
+        if balloon_2_y+30 == 300 or balloon_2_y-30 == 0:
+            balloon_2_y_speed *= -1
+        balloon_2_y += balloon_2_y_speed
+        balloon_2_y_switcher = random.randrange(0,50)
+        if balloon_2_y_switcher == 0:
+            balloon_2_y_speed *=-1
+            balloon_2_y += balloon_2_y_speed 
+            
+            # Balloon 3
+        if balloon_3_x+30 == WIDTH or balloon_3_x-30 == 0:
+            balloon_3_x_speed *= -1
+        balloon_3_x += balloon_3_x_speed
+        balloon_3_x_switcher = random.randrange(0,50)
+        if balloon_3_x_switcher == 0:
+            balloon_3_x_speed *=-1
+            balloon_3_x += balloon_3_x_speed
+        if balloon_3_y+30 == 300 or balloon_3_y-30 == 0:
+            balloon_3_y_speed *= -1
+        balloon_3_y += balloon_3_y_speed
+        balloon_3_y_switcher = random.randrange(0,50)
+        if balloon_3_y_switcher == 0:
+            balloon_3_y_speed *=-1
+            balloon_3_y += balloon_3_y_speed
+            
+            # Balloon 4
+        if balloon_4_x+30 == WIDTH or balloon_4_x-30 == 0:
+            balloon_4_x_speed *= -1
+        balloon_4_x += balloon_4_x_speed
+        balloon_4_x_switcher = random.randrange(0,50)
+        if balloon_4_x_switcher == 0:
+            balloon_4_x_speed *=-1
+            balloon_4_x += balloon_4_x_speed
+        if balloon_4_y+30 == 300 or balloon_4_y-30 == 0:
+            balloon_4_y_speed *= -1
+        balloon_4_y += balloon_4_y_speed
+        balloon_4_y_switcher = random.randrange(0,50)
+        if balloon_4_y_switcher == 0:
+            balloon_4_y_speed *=-1
+            balloon_4_y += balloon_4_y_speed
+            
+            # Balloon 5
+        if balloon_5_x+30 == WIDTH or balloon_5_x-30 == 0:
+            balloon_5_x_speed *= -1
+        balloon_5_x += balloon_5_x_speed
+        balloon_5_x_switcher = random.randrange(0,50)
+        if balloon_5_x_switcher == 0:
+            balloon_5_x_speed *=-1
+            balloon_5_x += balloon_5_x_speed 
+        if balloon_5_y+30 == 300 or balloon_5_y-30 == 0:
+            balloon_5_y_speed *= -1
+        balloon_5_y += balloon_5_y_speed
+        balloon_5_y_switcher = random.randrange(0,50)
+        if balloon_5_y_switcher == 0:
+            balloon_5_y_speed *=-1
+            balloon_5_y += balloon_5_y_speed
+
+        # DRAWING ---------------------------------------------------------
+        screen.fill((255, 255, 255))  # always the first drawing command
+        
+        # Background
+        pygame.draw.rect(screen, (160,105,25), (0,350,WIDTH,180)) # Floor
+        pygame.draw.rect(screen, (120,0,0), (0,0,WIDTH,350)) # Red Tent
+        pygame.draw.polygon(screen, (205,133,63), [(0,0), (0,300), (125,0)],width=0) #Brown Coloring 1
+        pygame.draw.polygon(screen, (205,133,63), [(200,0), (150,350), (300,350), (350,0)],width=0) #Brown Coloring 2
+        pygame.draw.polygon(screen, (205,133,63), [(425,0), (450,350), (600,350), (525,0)],width=0) #Brown Coloring 3
+        pygame.draw.polygon(screen, (205,133,63), [(600,0), (680, 300), (WIDTH,0)],width=0) #Brown Coloring 4
+        
+        # Clown
+        pygame.draw.circle(screen, (250,240,230), (player_x, player_y), 35) # Face
+        pygame.draw.circle(screen, (0,0,0), (player_x-10, player_y-10), 7) # Eye 1
+        pygame.draw.circle(screen, (0,0,0), (player_x+10, player_y-10), 7) # Eye 2
+        pygame.draw.ellipse(screen, (0,0,0), (player_x-10, player_y+17, 20,7)) # Mouth
+        pygame.draw.circle(screen, (255,0,0), (player_x, player_y+5), 8) # Nose 
+        pygame.draw.circle(screen, (0,255,0), (player_x-35, player_y-10), 15) # Hair
+        pygame.draw.circle(screen, (0,0,255), (player_x-20, player_y-30), 15) # Hair
+        pygame.draw.circle(screen, (255,0,255), (player_x, player_y-35), 15) # Hair
+        pygame.draw.circle(screen, (255,255,0), (player_x+20, player_y-30), 15) # Hair
+        pygame.draw.circle(screen, (0,255,255), (player_x+35, player_y-10), 15) # Hair
+        
+        # Darts
+        for i in darts:
+            pygame.draw.ellipse(screen, (0,0,0), (i[0],i[1],5,10)) # Drawing with for loops!!
+        
+        # Bomb
+        pygame.draw.circle(screen, (0,0,0), (bomb_x,bomb_y), 50)
+        pygame.draw.circle(screen, (200,0,0), (bomb_x,bomb_y+25), 10)
+        pygame.draw.polygon(screen, (200,0,0), [(bomb_x-10,bomb_y+9), (bomb_x-15, bomb_y-40), (bomb_x+15, bomb_y-40), (bomb_x+10,bomb_y+9)])
+        pygame.draw.rect(screen, (0,0,0), (bomb_x-20,bomb_y-60,40,15))
+        pygame.draw.line(screen, (0,0,0), (bomb_x,bomb_y-60),(bomb_x,bomb_y-75),width=2)
+        pygame.draw.line(screen, (0,0,0), (bomb_x,bomb_y-75),(bomb_x+10,bomb_y-85),width=2)
+        
+        # Shield
+        pygame.draw.rect(screen, (0,0,255), shield_orb_hitbox) # Shield Orb
+        if shield == True:
+            pygame.draw.circle(screen, (0,255,0), (player_x, player_y),60,width=7) # Active Shield
+
+        # Balloons
+            #Balloon 1
+        pygame.draw.polygon(screen, (255,0,0), [(balloon_x-10,balloon_y+35),(balloon_x, balloon_y+5),(balloon_x+10, balloon_y+35)], width=0)
+        pygame.draw.circle(screen, (255,0,0), (balloon_x,balloon_y),30)
+        pygame.draw.line(screen, (0,0,0), (balloon_x,balloon_y+35),(balloon_x,balloon_y+40),width=1)
+        pygame.draw.line(screen, (0,0,0), (balloon_x,balloon_y+40),(balloon_x-5,balloon_y+45),width=1)
+        pygame.draw.line(screen, (0,0,0), (balloon_x-5,balloon_y+45),(balloon_x-5,balloon_y+55),width=1)
+        pygame.draw.line(screen, (0,0,0), (balloon_x-5,balloon_y+55),(balloon_x-2,balloon_y+65),width=1)
+            #Balloon 2
+        pygame.draw.polygon(screen, (255,0,0), [(balloon_2_x-10,balloon_2_y+35),(balloon_2_x, balloon_2_y+5),(balloon_2_x+10, balloon_2_y+35)], width=0)
+        pygame.draw.circle(screen, (255,0,0), (balloon_2_x,balloon_2_y),30)
+        pygame.draw.line(screen, (0,0,0), (balloon_2_x,balloon_2_y+35),(balloon_2_x,balloon_2_y+40),width=1)
+        pygame.draw.line(screen, (0,0,0), (balloon_2_x,balloon_2_y+40),(balloon_2_x-5,balloon_2_y+45),width=1)
+        pygame.draw.line(screen, (0,0,0), (balloon_2_x-5,balloon_2_y+45),(balloon_2_x-5,balloon_2_y+55),width=1)
+        pygame.draw.line(screen, (0,0,0), (balloon_2_x-5,balloon_2_y+55),(balloon_2_x-2,balloon_2_y+65),width=1)
+            #Balloon 3
+        pygame.draw.polygon(screen, (255,0,0), [(balloon_3_x-10,balloon_3_y+35),(balloon_3_x, balloon_3_y+5),(balloon_3_x+10, balloon_3_y+35)], width=0)
+        pygame.draw.circle(screen, (255,0,0), (balloon_3_x,balloon_3_y),30)
+        pygame.draw.line(screen, (0,0,0), (balloon_3_x,balloon_3_y+35),(balloon_3_x,balloon_3_y+40),width=1)
+        pygame.draw.line(screen, (0,0,0), (balloon_3_x,balloon_3_y+40),(balloon_3_x-5,balloon_3_y+45),width=1)
+        pygame.draw.line(screen, (0,0,0), (balloon_3_x-5,balloon_3_y+45),(balloon_3_x-5,balloon_3_y+55),width=1)
+        pygame.draw.line(screen, (0,0,0), (balloon_3_x-5,balloon_3_y+55),(balloon_3_x-2,balloon_3_y+65),width=1)
+            #Balloon 4
+        pygame.draw.polygon(screen, (255,0,0), [(balloon_4_x-10,balloon_4_y+35),(balloon_4_x, balloon_4_y+5),(balloon_4_x+10, balloon_4_y+35)], width=0)
+        pygame.draw.circle(screen, (255,0,0), (balloon_4_x,balloon_4_y),30)
+        pygame.draw.line(screen, (0,0,0), (balloon_4_x,balloon_4_y+35),(balloon_4_x,balloon_4_y+40),width=1)
+        pygame.draw.line(screen, (0,0,0), (balloon_4_x,balloon_4_y+40),(balloon_4_x-5,balloon_4_y+45),width=1)
+        pygame.draw.line(screen, (0,0,0), (balloon_4_x-5,balloon_4_y+45),(balloon_4_x-5,balloon_4_y+55),width=1)
+        pygame.draw.line(screen, (0,0,0), (balloon_4_x-5,balloon_4_y+55),(balloon_4_x-2,balloon_4_y+65),width=1)
+            #Balloon 5
+        pygame.draw.polygon(screen, (255,0,0), [(balloon_5_x-10,balloon_5_y+35),(balloon_5_x, balloon_5_y+5),(balloon_5_x+10, balloon_5_y+35)], width=0)
+        pygame.draw.circle(screen, (255,0,0), (balloon_5_x,balloon_5_y),30)
+        pygame.draw.line(screen, (0,0,0), (balloon_5_x,balloon_5_y+35),(balloon_5_x,balloon_5_y+40),width=1)
+        pygame.draw.line(screen, (0,0,0), (balloon_5_x,balloon_5_y+40),(balloon_5_x-5,balloon_5_y+45),width=1)
+        pygame.draw.line(screen, (0,0,0), (balloon_5_x-5,balloon_5_y+45),(balloon_5_x-5,balloon_5_y+55),width=1)
+        pygame.draw.line(screen, (0,0,0), (balloon_5_x-5,balloon_5_y+55),(balloon_5_x-2,balloon_5_y+65),width=1)
+            
+        # Explosion
+        if explosion == True:
+            pygame.time.wait(500)
+            pygame.draw.circle(screen, (255,69,0), (bomb_x,bomb_y), explosion_radius)
+            
+        # Score Counter
+        draw_text(f"Score: {score}", text_font, (0,0,0), 5,400)
+# Must be the last two lines
+# of the game loop
+    pygame.display.flip()
+    clock.tick(30)
+    #---------------------------
+pygame.quit()
